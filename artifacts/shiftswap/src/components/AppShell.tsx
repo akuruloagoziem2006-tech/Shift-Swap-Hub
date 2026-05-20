@@ -64,10 +64,10 @@ export function AppShell({ children }: AppShellProps) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 px-4 py-5 border-b border-border">
-        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-          <ArrowLeftRight className="w-4 h-4 text-primary-foreground" />
+        <div className="w-9 h-9 bg-teal-600 rounded-xl flex items-center justify-center">
+          <span className="text-white font-bold text-xl select-none">⇄</span>
         </div>
-        <span className="font-bold text-lg text-foreground tracking-tight">ShiftSwap</span>
+        <span className="font-semibold text-lg text-foreground">ShiftSwap</span>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
@@ -181,10 +181,10 @@ export function AppShell({ children }: AppShellProps) {
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
-              <ArrowLeftRight className="w-3.5 h-3.5 text-primary-foreground" />
+            <div className="w-7 h-7 bg-teal-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm select-none">⇄</span>
             </div>
-            <span className="font-bold text-foreground">ShiftSwap</span>
+            <span className="font-semibold text-foreground">ShiftSwap</span>
           </div>
         </header>
 
