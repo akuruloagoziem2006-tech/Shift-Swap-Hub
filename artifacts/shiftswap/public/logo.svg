@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" fill="transparent" />
+  <path d="M 30,15 L 45,30 L 30,45" fill="none" stroke="#F97316" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 50,45 L 35,30 L 50,15" fill="none" stroke="#0F172A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="65" y="40" font-family="Inter, sans-serif" font-weight="700" font-size="32" fill="#0F172A">ShiftSwap</text>
+</svg>

@@ -1,0 +1,197 @@
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "wouter";
+import { useUser, useClerk, Show } from "@clerk/react";
+import {
+  LayoutDashboard,
+  Calendar,
+  MessageSquare,
+  PlusCircle,
+  List,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  Zap,
+  ArrowLeftRight,
+  Bell,
+  Sun,
+  Moon,
+  ChevronRight,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { useGetDashboardStats } from "@workspace/api-client-react";
+import { getTheme, setTheme } from "@/lib/theme";
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const navItems = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/shifts", label: "Browse Shifts", icon: List },
+  { href: "/shifts/new", label: "Post a Shift", icon: PlusCircle },
+  { href: "/my-shifts", label: "My Shifts", icon: ArrowLeftRight },
+  { href: "/my-requests", label: "My Requests", icon: Bell },
+  { href: "/messages", label: "Messages", icon: MessageSquare },
+  { href: "/calendar", label: "Calendar", icon: Calendar },
+  { href: "/pricing", label: "Go Pro", icon: Zap },
+  { href: "/settings", label: "Settings", icon: Settings },
+];
+
+interface AppShellProps {
+  children: React.ReactNode;
+}
+
+export function AppShell({ children }: AppShellProps) {
+  const [location] = useLocation();
+  const { user } = useUser();
+  const { signOut } = useClerk();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDark, setIsDark] = useState(getTheme() === "dark");
+  const { data: stats } = useGetDashboardStats();
+
+  const handleThemeToggle = () => {
+    const next = isDark ? "light" : "dark";
+    setTheme(next);
+    setIsDark(next === "dark");
+  };
+
+  const handleSignOut = () => {
+    signOut({ redirectUrl: basePath || "/" });
+  };
+
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center gap-2 px-4 py-5 border-b border-border">
+        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+          <ArrowLeftRight className="w-4 h-4 text-primary-foreground" />
+        </div>
+        <span className="font-bold text-lg text-foreground tracking-tight">ShiftSwap</span>
+      </div>
+
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {navItems.map(({ href, label, icon: Icon }) => {
+          const isActive = location === href || (href !== "/dashboard" && location.startsWith(href));
+          const showBadge =
+            href === "/my-shifts" && stats && stats.incomingRequests > 0
+              ? stats.incomingRequests
+              : href === "/messages"
+              ? 0
+              : 0;
+
+          return (
+            <Link
+              key={href}
+              to={href}
+              onClick={() => setSidebarOpen(false)}
+              data-testid={`nav-${label.toLowerCase().replace(/\s+/g, "-")}`}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group relative",
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+              <span className="flex-1">{label}</span>
+              {showBadge > 0 && (
+                <Badge variant="destructive" className="text-xs px-1.5 py-0 h-5">
+                  {showBadge}
+                </Badge>
+              )}
+              {isActive && <ChevronRight className="w-3 h-3 opacity-60" />}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="px-3 py-4 border-t border-border space-y-2">
+        <button
+          onClick={handleThemeToggle}
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-muted hover:text-foreground w-full transition-colors"
+          data-testid="button-theme-toggle"
+        >
+          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          <span>{isDark ? "Light mode" : "Dark mode"}</span>
+        </button>
+
+        <div className="flex items-center gap-3 px-3 py-2">
+          <Avatar className="w-7 h-7">
+            <AvatarImage src={user?.imageUrl} />
+            <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+              {user?.firstName?.[0] ?? user?.emailAddresses?.[0]?.emailAddress?.[0]?.toUpperCase() ?? "U"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground truncate">
+              {user?.firstName ?? user?.emailAddresses?.[0]?.emailAddress ?? "User"}
+            </p>
+          </div>
+          <button
+            onClick={handleSignOut}
+            className="text-muted-foreground hover:text-destructive transition-colors"
+            data-testid="button-sign-out"
+            title="Sign out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen bg-background overflow-hidden">
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex flex-col w-60 border-r border-border bg-card shrink-0">
+        <SidebarContent />
+      </aside>
+
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-40 flex">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <aside className="relative z-50 flex flex-col w-72 bg-card border-r border-border shadow-2xl">
+            <div className="absolute top-3 right-3">
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-1.5 rounded-md text-muted-foreground hover:bg-muted"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <SidebarContent />
+          </aside>
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Mobile topbar */}
+        <header className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-1.5 rounded-md text-muted-foreground hover:bg-muted"
+            data-testid="button-open-sidebar"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
+              <ArrowLeftRight className="w-3.5 h-3.5 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-foreground">ShiftSwap</span>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}

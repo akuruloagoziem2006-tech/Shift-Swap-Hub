@@ -3,20 +3,32 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: ShiftSwap API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: profiles
+    description: User profiles
+  - name: shifts
+    description: Shift management
+  - name: requests
+    description: Shift swap/cover requests
+  - name: messages
+    description: In-app messaging
+  - name: dashboard
+    description: Dashboard stats and activity
+  - name: checkout
+    description: Stripe checkout
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +36,737 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /profiles/me:
+    get:
+      operationId: getMyProfile
+      tags: [profiles]
+      summary: Get current user's profile
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "404":
+          description: Not found
+    put:
+      operationId: upsertProfile
+      tags: [profiles]
+      summary: Create or update current user's profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+
+  /shifts:
+    get:
+      operationId: listShifts
+      tags: [shifts]
+      summary: List available shifts with filters
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: location
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: shiftType
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: dateFrom
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: dateTo
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: minPay
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: maxPay
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: mine
+          in: query
+          schema:
+            type: ["boolean", "null"]
+      responses:
+        "200":
+          description: List of shifts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShiftWithProfile"
+    post:
+      operationId: createShift
+      tags: [shifts]
+      summary: Post a new shift
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShiftInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shift"
+
+  /shifts/{id}:
+    get:
+      operationId: getShift
+      tags: [shifts]
+      summary: Get a single shift
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Shift
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShiftWithProfile"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateShift
+      tags: [shifts]
+      summary: Update a shift
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShiftUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shift"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteShift
+      tags: [shifts]
+      summary: Delete a shift
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /shifts/{id}/requests:
+    get:
+      operationId: listShiftRequests
+      tags: [requests]
+      summary: List requests for a shift
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShiftRequestWithProfile"
+    post:
+      operationId: createShiftRequest
+      tags: [requests]
+      summary: Apply to swap/cover a shift
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShiftRequestInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShiftRequest"
+
+  /requests/{id}/approve:
+    patch:
+      operationId: approveRequest
+      tags: [requests]
+      summary: Approve a shift request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShiftRequest"
+
+  /requests/{id}/reject:
+    patch:
+      operationId: rejectRequest
+      tags: [requests]
+      summary: Reject a shift request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShiftRequest"
+
+  /my-requests:
+    get:
+      operationId: listMyRequests
+      tags: [requests]
+      summary: List current user's outgoing requests
+      responses:
+        "200":
+          description: My requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShiftRequestWithShift"
+
+  /messages/{conversationId}:
+    get:
+      operationId: getMessages
+      tags: [messages]
+      summary: Get messages for a conversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send a message
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "201":
+          description: Sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /conversations:
+    get:
+      operationId: listConversations
+      tags: [messages]
+      summary: List conversations for current user
+      responses:
+        "200":
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConversationSummary"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard summary stats
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Get recent activity feed
+      responses:
+        "200":
+          description: Activity items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /checkout/create-session:
+    post:
+      operationId: createCheckoutSession
+      tags: [checkout]
+      summary: Create Stripe checkout session for Pro Lifetime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutSessionInput"
+      responses:
+        "200":
+          description: Checkout session URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutSession"
+
+  /checkout/verify:
+    get:
+      operationId: verifyCheckout
+      tags: [checkout]
+      summary: Verify checkout session and upgrade user to Pro
+      parameters:
+        - name: session_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutVerification"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    Profile:
+      type: object
+      required: [id, clerkUserId, displayName, jobRole, createdAt]
+      properties:
+        id:
+          type: integer
+        clerkUserId:
+          type: string
+        displayName:
+          type: string
+        jobRole:
+          type: string
+        location:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        preferredDays:
+          type: array
+          items:
+            type: string
+        preferredTimes:
+          type: array
+          items:
+            type: string
+        minHourlyRate:
+          type: ["number", "null"]
+        maxHourlyRate:
+          type: ["number", "null"]
+        isPro:
+          type: boolean
+        createdAt:
+          type: string
+
+    ProfileInput:
+      type: object
+      required: [displayName, jobRole]
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+        jobRole:
+          type: string
+          minLength: 1
+        location:
+          type: string
+        bio:
+          type: string
+        avatarUrl:
+          type: string
+        preferredDays:
+          type: array
+          items:
+            type: string
+        preferredTimes:
+          type: array
+          items:
+            type: string
+        minHourlyRate:
+          type: number
+        maxHourlyRate:
+          type: number
+
+    Shift:
+      type: object
+      required: [id, clerkUserId, title, role, location, shiftDate, startTime, endTime, shiftType, status, createdAt]
+      properties:
+        id:
+          type: integer
+        clerkUserId:
+          type: string
+        title:
+          type: string
+        role:
+          type: string
+        location:
+          type: string
+        shiftDate:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+        hourlyRate:
+          type: ["number", "null"]
+        shiftType:
+          type: string
+          enum: [swap, cover]
+        notes:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [open, pending, filled, cancelled]
+        createdAt:
+          type: string
+
+    ShiftWithProfile:
+      type: object
+      required: [id, clerkUserId, title, role, location, shiftDate, startTime, endTime, shiftType, status, createdAt]
+      properties:
+        id:
+          type: integer
+        clerkUserId:
+          type: string
+        title:
+          type: string
+        role:
+          type: string
+        location:
+          type: string
+        shiftDate:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+        hourlyRate:
+          type: ["number", "null"]
+        shiftType:
+          type: string
+          enum: [swap, cover]
+        notes:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [open, pending, filled, cancelled]
+        createdAt:
+          type: string
+        poster:
+          $ref: "#/components/schemas/Profile"
+        requestCount:
+          type: integer
+
+    ShiftInput:
+      type: object
+      required: [title, role, location, shiftDate, startTime, endTime, shiftType]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        role:
+          type: string
+          minLength: 1
+        location:
+          type: string
+          minLength: 1
+        shiftDate:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+        hourlyRate:
+          type: number
+        shiftType:
+          type: string
+          enum: [swap, cover]
+        notes:
+          type: string
+
+    ShiftUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        role:
+          type: string
+        location:
+          type: string
+        shiftDate:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+        hourlyRate:
+          type: number
+        shiftType:
+          type: string
+          enum: [swap, cover]
+        notes:
+          type: string
+        status:
+          type: string
+          enum: [open, pending, filled, cancelled]
+
+    ShiftRequest:
+      type: object
+      required: [id, shiftId, clerkUserId, status, createdAt]
+      properties:
+        id:
+          type: integer
+        shiftId:
+          type: integer
+        clerkUserId:
+          type: string
+        message:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        createdAt:
+          type: string
+
+    ShiftRequestInput:
+      type: object
+      properties:
+        message:
+          type: string
+
+    ShiftRequestWithProfile:
+      type: object
+      required: [id, shiftId, clerkUserId, status, createdAt]
+      properties:
+        id:
+          type: integer
+        shiftId:
+          type: integer
+        clerkUserId:
+          type: string
+        message:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        createdAt:
+          type: string
+        requester:
+          $ref: "#/components/schemas/Profile"
+
+    ShiftRequestWithShift:
+      type: object
+      required: [id, shiftId, clerkUserId, status, createdAt]
+      properties:
+        id:
+          type: integer
+        shiftId:
+          type: integer
+        clerkUserId:
+          type: string
+        message:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        createdAt:
+          type: string
+        shift:
+          $ref: "#/components/schemas/Shift"
+
+    Message:
+      type: object
+      required: [id, conversationId, senderClerkUserId, content, createdAt]
+      properties:
+        id:
+          type: integer
+        conversationId:
+          type: string
+        senderClerkUserId:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+        senderProfile:
+          $ref: "#/components/schemas/Profile"
+
+    MessageInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+
+    ConversationSummary:
+      type: object
+      required: [conversationId, otherUser, lastMessage, lastMessageAt, unreadCount]
+      properties:
+        conversationId:
+          type: string
+        otherUser:
+          $ref: "#/components/schemas/Profile"
+        lastMessage:
+          type: string
+        lastMessageAt:
+          type: string
+        unreadCount:
+          type: integer
+
+    DashboardStats:
+      type: object
+      required: [myActiveShifts, incomingRequests, outgoingRequests, totalSwapsCompleted, isPro]
+      properties:
+        myActiveShifts:
+          type: integer
+        incomingRequests:
+          type: integer
+        outgoingRequests:
+          type: integer
+        totalSwapsCompleted:
+          type: integer
+        isPro:
+          type: boolean
+
+    ActivityItem:
+      type: object
+      required: [id, type, description, createdAt]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [shift_posted, request_received, request_approved, request_rejected, swap_completed]
+        description:
+          type: string
+        createdAt:
+          type: string
+        shiftId:
+          type: ["integer", "null"]
+
+    CheckoutSessionInput:
+      type: object
+      required: [successUrl, cancelUrl]
+      properties:
+        successUrl:
+          type: string
+        cancelUrl:
+          type: string
+
+    CheckoutSession:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+
+    CheckoutVerification:
+      type: object
+      required: [success, isPro]
+      properties:
+        success:
+          type: boolean
+        isPro:
+          type: boolean
