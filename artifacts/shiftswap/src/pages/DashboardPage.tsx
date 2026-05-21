@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { useUser } from "@clerk/react";
+import { useAuth } from "@/lib/auth-context";
 import {
   ArrowLeftRight,
   Bell,
@@ -39,7 +39,7 @@ function timeAgo(dateStr: string) {
 }
 
 export default function DashboardPage() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { data: stats, isLoading: statsLoading } = useGetDashboardStats();
   const { data: activity, isLoading: activityLoading } = useGetRecentActivity();
 
@@ -85,7 +85,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">
             Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"},{" "}
-            {user?.firstName ?? "there"}.
+            {user?.user_metadata?.full_name?.split(" ")[0] ?? user?.email?.split("@")[0] ?? "there"}.
           </h1>
           <p className="text-muted-foreground mt-1">Here's what's happening with your shifts.</p>
         </div>

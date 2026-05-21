@@ -1,22 +1,12 @@
 import { Router, type IRouter } from "express";
-import { getAuth } from "@clerk/express";
 import { eq } from "drizzle-orm";
 import { db, profilesTable } from "@workspace/db";
 import { UpsertProfileBody } from "@workspace/api-zod";
-import { logger } from "../lib/logger";
+import { requireAuth } from "../middlewares/supabaseAuth";
+
+export { requireAuth };
 
 const router: IRouter = Router();
-
-function requireAuth(req: any, res: any, next: any) {
-  const auth = getAuth(req);
-  const userId = auth?.userId;
-  if (!userId) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-  req.userId = userId;
-  next();
-}
 
 router.get("/profiles/me", requireAuth, async (req: any, res): Promise<void> => {
   const [profile] = await db
@@ -90,5 +80,4 @@ router.put("/profiles/me", requireAuth, async (req: any, res): Promise<void> => 
   });
 });
 
-export { requireAuth };
 export default router;

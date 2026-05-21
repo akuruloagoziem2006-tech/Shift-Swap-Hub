@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { useUser } from "@clerk/react";
+import { useAuth } from "@/lib/auth-context";
 import {
   MapPin,
   Clock,
@@ -59,7 +59,7 @@ function formatDate(dateStr: string) {
 }
 
 export default function ShiftsPage() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [roleFilter, setRoleFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [search, setSearch] = useState("");

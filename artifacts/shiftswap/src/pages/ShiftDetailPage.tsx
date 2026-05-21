@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { useUser } from "@clerk/react";
+import { useAuth } from "@/lib/auth-context";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -38,7 +38,7 @@ interface Props { id: number }
 
 export default function ShiftDetailPage({ id }: Props) {
   const [, navigate] = useLocation();
-  const { user } = useUser();
+  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [applyMsg, setApplyMsg] = useState("");
@@ -48,14 +48,14 @@ export default function ShiftDetailPage({ id }: Props) {
     query: { queryKey: getGetShiftQueryKey(id) },
   });
   const { data: requests } = useListShiftRequests(id, {
-    query: { enabled: !!shift && shift.clerkUserId === user?.id, queryKey: getListShiftRequestsQueryKey(id) },
+    query: { enabled: !!shift && shift.clerkUserId === user?.id, queryKey: getListShiftRequestsQueryKey(id) }, // clerkUserId field will be renamed supabaseUserId after DB migration
   });
   const createRequest = useCreateShiftRequest();
   const approveRequest = useApproveRequest();
   const rejectRequest = useRejectRequest();
   const deleteShift = useDeleteShift();
 
-  const isOwner = user?.id === shift?.clerkUserId;
+  const isOwner = !!user && user.id === shift?.clerkUserId;
   const alreadyApplied = false; // Could track this
 
   const handleApply = () => {

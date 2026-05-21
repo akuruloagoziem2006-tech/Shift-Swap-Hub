@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useUser, useClerk, Show } from "@clerk/react";
+import { useAuth } from "@/lib/auth-context";
 import {
   LayoutDashboard,
   Calendar,
@@ -18,14 +18,11 @@ import {
   Moon,
   ChevronRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useGetDashboardStats } from "@workspace/api-client-react";
 import { getTheme, setTheme } from "@/lib/theme";
-
-const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -45,8 +42,7 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const [location] = useLocation();
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(getTheme() === "dark");
   const { data: stats } = useGetDashboardStats();
@@ -57,9 +53,8 @@ export function AppShell({ children }: AppShellProps) {
     setIsDark(next === "dark");
   };
 
-  const handleSignOut = () => {
-    signOut({ redirectUrl: basePath || "/" });
-  };
+  const displayName = user?.user_metadata?.full_name ?? user?.email ?? "User";
+  const initials = displayName[0]?.toUpperCase() ?? "U";
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -76,8 +71,6 @@ export function AppShell({ children }: AppShellProps) {
           const showBadge =
             href === "/my-shifts" && stats && stats.incomingRequests > 0
               ? stats.incomingRequests
-              : href === "/messages"
-              ? 0
               : 0;
 
           return (
@@ -118,18 +111,15 @@ export function AppShell({ children }: AppShellProps) {
 
         <div className="flex items-center gap-3 px-3 py-2">
           <Avatar className="w-7 h-7">
-            <AvatarImage src={user?.imageUrl} />
             <AvatarFallback className="text-xs bg-primary text-primary-foreground">
-              {user?.firstName?.[0] ?? user?.emailAddresses?.[0]?.emailAddress?.[0]?.toUpperCase() ?? "U"}
+              {initials}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">
-              {user?.firstName ?? user?.emailAddresses?.[0]?.emailAddress ?? "User"}
-            </p>
+            <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
           </div>
           <button
-            onClick={handleSignOut}
+            onClick={signOut}
             className="text-muted-foreground hover:text-destructive transition-colors"
             data-testid="button-sign-out"
             title="Sign out"

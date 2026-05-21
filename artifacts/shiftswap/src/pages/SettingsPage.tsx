@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useUser } from "@clerk/react";
+import { useAuth } from "@/lib/auth-context";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -56,7 +56,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function SettingsPage() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -91,7 +91,7 @@ export default function SettingsPage() {
       });
     } else if (user) {
       form.reset({
-        displayName: user.firstName ? `${user.firstName} ${user.lastName ?? ""}`.trim() : "",
+        displayName: user.user_metadata?.full_name ?? "",
         jobRole: "",
         location: "",
         bio: "",
@@ -146,18 +146,15 @@ export default function SettingsPage() {
       {/* User info */}
       <div className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl">
         <Avatar className="w-14 h-14">
-          <AvatarImage src={user?.imageUrl} />
           <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">
-            {user?.firstName?.[0] ?? "U"}
+            {(user?.user_metadata?.full_name?.[0] ?? user?.email?.[0] ?? "U").toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div>
           <p className="font-semibold text-foreground">
-            {user?.fullName ?? user?.emailAddresses?.[0]?.emailAddress}
+            {user?.user_metadata?.full_name ?? user?.email}
           </p>
-          <p className="text-sm text-muted-foreground">
-            {user?.emailAddresses?.[0]?.emailAddress}
-          </p>
+          <p className="text-sm text-muted-foreground">{user?.email}</p>
         </div>
       </div>
 

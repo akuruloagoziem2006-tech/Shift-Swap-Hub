@@ -1,5 +1,4 @@
 import { Link } from "wouter";
-import { useUser } from "@clerk/react";
 import { PlusCircle, ArrowLeftRight, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +20,6 @@ const statusColors: Record<string, string> = {
 };
 
 export default function MyShiftsPage() {
-  const { user } = useUser();
   const { data: shifts, isLoading } = useListShifts({ mine: true });
 
   return (
