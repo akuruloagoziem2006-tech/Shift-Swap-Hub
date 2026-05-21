@@ -19,7 +19,7 @@ export const shiftsTable = pgTable("shifts", {
   startTime: text("start_time").notNull(),
   endTime: text("end_time").notNull(),
   hourlyRate: real("hourly_rate"),
-  shiftType: text("shift_type", { enum: ["swap", "cover"] }).notNull(),
+  shiftType: text("shift_type", { enum: ["swap", "cover", "drop"] }).notNull(),
   notes: text("notes"),
   status: text("status", {
     enum: ["open", "pending", "filled", "cancelled"],

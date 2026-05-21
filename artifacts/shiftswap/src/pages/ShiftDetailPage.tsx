@@ -169,9 +169,13 @@ export default function ShiftDetailPage({ id }: Props) {
           <div className="flex flex-wrap gap-2">
             <Badge variant="secondary" className={cn(
               "text-sm",
-              shift.shiftType === "swap" ? "bg-primary/10 text-primary" : "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+              shift.shiftType === "swap"
+                ? "bg-primary/10 text-primary"
+                : shift.shiftType === "drop"
+                ? "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
+                : "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
             )}>
-              {shift.shiftType === "swap" ? "Swap" : "Cover"}
+              {shift.shiftType === "swap" ? "Swap" : shift.shiftType === "drop" ? "Drop" : "Cover"}
             </Badge>
             <Badge variant="outline" className={cn(
               "text-sm",

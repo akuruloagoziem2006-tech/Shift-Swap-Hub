@@ -50,6 +50,7 @@ export type ShiftShiftType = typeof ShiftShiftType[keyof typeof ShiftShiftType];
 export const ShiftShiftType = {
   swap: 'swap',
   cover: 'cover',
+  drop: 'drop',
 } as const;
 
 export type ShiftStatus = typeof ShiftStatus[keyof typeof ShiftStatus];
@@ -86,6 +87,7 @@ export type ShiftWithProfileShiftType = typeof ShiftWithProfileShiftType[keyof t
 export const ShiftWithProfileShiftType = {
   swap: 'swap',
   cover: 'cover',
+  drop: 'drop',
 } as const;
 
 export type ShiftWithProfileStatus = typeof ShiftWithProfileStatus[keyof typeof ShiftWithProfileStatus];
@@ -124,6 +126,7 @@ export type ShiftInputShiftType = typeof ShiftInputShiftType[keyof typeof ShiftI
 export const ShiftInputShiftType = {
   swap: 'swap',
   cover: 'cover',
+  drop: 'drop',
 } as const;
 
 export interface ShiftInput {
@@ -147,6 +150,7 @@ export type ShiftUpdateShiftType = typeof ShiftUpdateShiftType[keyof typeof Shif
 export const ShiftUpdateShiftType = {
   swap: 'swap',
   cover: 'cover',
+  drop: 'drop',
 } as const;
 
 export type ShiftUpdateStatus = typeof ShiftUpdateStatus[keyof typeof ShiftUpdateStatus];

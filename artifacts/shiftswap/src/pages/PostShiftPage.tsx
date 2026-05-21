@@ -34,7 +34,7 @@ const schema = z.object({
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
   hourlyRate: z.string().optional(),
-  shiftType: z.enum(["swap", "cover"]),
+  shiftType: z.enum(["swap", "cover", "drop"]),
   notes: z.string().optional(),
 });
 
@@ -171,6 +171,7 @@ export default function PostShiftPage() {
                         <SelectContent>
                           <SelectItem value="cover">Cover (I need someone)</SelectItem>
                           <SelectItem value="swap">Swap (Mutual exchange)</SelectItem>
+                          <SelectItem value="drop">Drop (Giving up shift)</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

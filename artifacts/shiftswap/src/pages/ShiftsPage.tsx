@@ -43,6 +43,7 @@ const roleOptions = [
 const typeLabels: Record<string, string> = {
   swap: "Swap",
   cover: "Cover",
+  drop: "Drop",
 };
 
 const statusColors: Record<string, string> = {
@@ -65,7 +66,7 @@ export default function ShiftsPage() {
 
   const { data: shifts, isLoading } = useListShifts({
     role: roleFilter || undefined,
-    shiftType: (typeFilter as "swap" | "cover") || undefined,
+    shiftType: (typeFilter as "swap" | "cover" | "drop") || undefined,
   });
 
   const filtered = shifts?.filter((s) => {
@@ -124,6 +125,7 @@ export default function ShiftsPage() {
             <SelectItem value="all">All types</SelectItem>
             <SelectItem value="swap">Swap</SelectItem>
             <SelectItem value="cover">Cover</SelectItem>
+            <SelectItem value="drop">Drop</SelectItem>
           </SelectContent>
         </Select>
       </div>

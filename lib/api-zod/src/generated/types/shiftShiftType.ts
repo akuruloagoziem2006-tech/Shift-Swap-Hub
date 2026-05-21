@@ -12,4 +12,5 @@ export type ShiftShiftType = typeof ShiftShiftType[keyof typeof ShiftShiftType];
 export const ShiftShiftType = {
   swap: 'swap',
   cover: 'cover',
+  drop: 'drop',
 } as const;

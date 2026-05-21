@@ -96,7 +96,7 @@ export const ListShiftsResponseItem = zod.object({
   "startTime": zod.string(),
   "endTime": zod.string(),
   "hourlyRate": zod.number().nullish(),
-  "shiftType": zod.enum(['swap', 'cover']),
+  "shiftType": zod.enum(['swap', 'cover', 'drop']),
   "notes": zod.string().nullish(),
   "status": zod.enum(['open', 'pending', 'filled', 'cancelled']),
   "createdAt": zod.string(),
@@ -136,7 +136,7 @@ export const CreateShiftBody = zod.object({
   "startTime": zod.string(),
   "endTime": zod.string(),
   "hourlyRate": zod.number().optional(),
-  "shiftType": zod.enum(['swap', 'cover']),
+  "shiftType": zod.enum(['swap', 'cover', 'drop']),
   "notes": zod.string().optional()
 })
 
@@ -158,7 +158,7 @@ export const GetShiftResponse = zod.object({
   "startTime": zod.string(),
   "endTime": zod.string(),
   "hourlyRate": zod.number().nullish(),
-  "shiftType": zod.enum(['swap', 'cover']),
+  "shiftType": zod.enum(['swap', 'cover', 'drop']),
   "notes": zod.string().nullish(),
   "status": zod.enum(['open', 'pending', 'filled', 'cancelled']),
   "createdAt": zod.string(),
@@ -196,7 +196,7 @@ export const UpdateShiftBody = zod.object({
   "startTime": zod.string().optional(),
   "endTime": zod.string().optional(),
   "hourlyRate": zod.number().optional(),
-  "shiftType": zod.enum(['swap', 'cover']).optional(),
+  "shiftType": zod.enum(['swap', 'cover', 'drop']).optional(),
   "notes": zod.string().optional(),
   "status": zod.enum(['open', 'pending', 'filled', 'cancelled']).optional()
 })
@@ -211,7 +211,7 @@ export const UpdateShiftResponse = zod.object({
   "startTime": zod.string(),
   "endTime": zod.string(),
   "hourlyRate": zod.number().nullish(),
-  "shiftType": zod.enum(['swap', 'cover']),
+  "shiftType": zod.enum(['swap', 'cover', 'drop']),
   "notes": zod.string().nullish(),
   "status": zod.enum(['open', 'pending', 'filled', 'cancelled']),
   "createdAt": zod.string()
@@ -325,7 +325,7 @@ export const ListMyRequestsResponseItem = zod.object({
   "startTime": zod.string(),
   "endTime": zod.string(),
   "hourlyRate": zod.number().nullish(),
-  "shiftType": zod.enum(['swap', 'cover']),
+  "shiftType": zod.enum(['swap', 'cover', 'drop']),
   "notes": zod.string().nullish(),
   "status": zod.enum(['open', 'pending', 'filled', 'cancelled']),
   "createdAt": zod.string()

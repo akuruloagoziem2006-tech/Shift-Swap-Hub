@@ -12,4 +12,5 @@ export type ShiftWithProfileShiftType = typeof ShiftWithProfileShiftType[keyof t
 export const ShiftWithProfileShiftType = {
   swap: 'swap',
   cover: 'cover',
+  drop: 'drop',
 } as const;

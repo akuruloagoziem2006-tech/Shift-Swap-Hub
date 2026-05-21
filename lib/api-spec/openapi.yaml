@@ -512,7 +512,7 @@ components:
           type: ["number", "null"]
         shiftType:
           type: string
-          enum: [swap, cover]
+          enum: [swap, cover, drop]
         notes:
           type: ["string", "null"]
         status:
@@ -545,7 +545,7 @@ components:
           type: ["number", "null"]
         shiftType:
           type: string
-          enum: [swap, cover]
+          enum: [swap, cover, drop]
         notes:
           type: ["string", "null"]
         status:
@@ -581,7 +581,7 @@ components:
           type: number
         shiftType:
           type: string
-          enum: [swap, cover]
+          enum: [swap, cover, drop]
         notes:
           type: string
 
@@ -604,7 +604,7 @@ components:
           type: number
         shiftType:
           type: string
-          enum: [swap, cover]
+          enum: [swap, cover, drop]
         notes:
           type: string
         status:
