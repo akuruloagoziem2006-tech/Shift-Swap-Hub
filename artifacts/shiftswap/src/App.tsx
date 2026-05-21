@@ -29,7 +29,11 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function Protected({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+      <div className="w-8 h-8 border-4 border-teal-600 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
   if (!session) return <Redirect to="/sign-in" />;
   return <AppShell>{children}</AppShell>;
 }

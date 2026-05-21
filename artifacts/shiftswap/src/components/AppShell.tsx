@@ -58,14 +58,14 @@ export function AppShell({ children }: AppShellProps) {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 px-4 py-5 border-b border-border">
-        <div className="w-9 h-9 bg-teal-600 rounded-xl flex items-center justify-center">
+      <div className="flex items-center gap-2 px-4 py-5 border-b border-zinc-800">
+        <div className="w-9 h-9 bg-teal-600 rounded-xl flex items-center justify-center shrink-0">
           <span className="text-white font-bold text-xl select-none">⇄</span>
         </div>
-        <span className="font-semibold text-lg text-foreground">ShiftSwap</span>
+        <span className="font-semibold text-lg text-white">ShiftSwap</span>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = location === href || (href !== "/dashboard" && location.startsWith(href));
           const showBadge =
@@ -82,8 +82,8 @@ export function AppShell({ children }: AppShellProps) {
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group relative",
                 isActive
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-teal-600 text-white shadow-sm"
+                  : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -99,28 +99,28 @@ export function AppShell({ children }: AppShellProps) {
         })}
       </nav>
 
-      <div className="px-3 py-4 border-t border-border space-y-2">
+      <div className="px-3 py-4 border-t border-zinc-800 space-y-1">
         <button
           onClick={handleThemeToggle}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-muted hover:text-foreground w-full transition-colors"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 w-full transition-colors"
           data-testid="button-theme-toggle"
         >
           {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           <span>{isDark ? "Light mode" : "Dark mode"}</span>
         </button>
 
-        <div className="flex items-center gap-3 px-3 py-2">
-          <Avatar className="w-7 h-7">
-            <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+        <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
+          <Avatar className="w-7 h-7 shrink-0">
+            <AvatarFallback className="text-xs bg-teal-600 text-white">
               {initials}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+            <p className="text-sm font-medium text-zinc-100 truncate">{displayName}</p>
           </div>
           <button
             onClick={signOut}
-            className="text-muted-foreground hover:text-destructive transition-colors"
+            className="text-zinc-500 hover:text-red-400 transition-colors shrink-0"
             data-testid="button-sign-out"
             title="Sign out"
           >
@@ -132,9 +132,9 @@ export function AppShell({ children }: AppShellProps) {
   );
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-zinc-950 overflow-hidden">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex flex-col w-60 border-r border-border bg-card shrink-0">
+      <aside className="hidden md:flex flex-col w-60 bg-zinc-900 border-r border-zinc-800 shrink-0">
         <SidebarContent />
       </aside>
 
@@ -142,14 +142,14 @@ export function AppShell({ children }: AppShellProps) {
       {sidebarOpen && (
         <div className="md:hidden fixed inset-0 z-40 flex">
           <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="relative z-50 flex flex-col w-72 bg-card border-r border-border shadow-2xl">
+          <aside className="relative z-50 flex flex-col w-72 bg-zinc-900 border-r border-zinc-800 shadow-2xl">
             <div className="absolute top-3 right-3">
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-1.5 rounded-md text-muted-foreground hover:bg-muted"
+                className="p-1.5 rounded-md text-zinc-400 hover:bg-zinc-800"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -162,10 +162,10 @@ export function AppShell({ children }: AppShellProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile topbar */}
-        <header className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
+        <header className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-zinc-800 bg-zinc-900">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-1.5 rounded-md text-muted-foreground hover:bg-muted"
+            className="p-1.5 rounded-md text-zinc-400 hover:bg-zinc-800"
             data-testid="button-open-sidebar"
           >
             <Menu className="w-5 h-5" />
@@ -174,11 +174,11 @@ export function AppShell({ children }: AppShellProps) {
             <div className="w-7 h-7 bg-teal-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm select-none">⇄</span>
             </div>
-            <span className="font-semibold text-foreground">ShiftSwap</span>
+            <span className="font-semibold text-white">ShiftSwap</span>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-zinc-900">
           {children}
         </main>
       </div>
