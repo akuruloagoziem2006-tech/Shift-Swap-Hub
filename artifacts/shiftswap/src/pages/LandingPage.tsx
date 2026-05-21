@@ -9,13 +9,13 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       {/* Navbar */}
-      <nav className="border-b bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <nav className="border-b bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-teal-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xl select-none">⇄</span>
+            <div className="w-10 h-10 bg-teal-600 rounded-2xl flex items-center justify-center">
+              <span className="text-white font-bold text-2xl select-none">⇄</span>
             </div>
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">ShiftSwap</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-white">ShiftSwap</h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -23,51 +23,48 @@ export default function LandingPage() {
               <Button variant="ghost" className="hidden md:flex" data-testid="link-sign-in-nav">Sign in</Button>
             </Link>
             <Link to="/sign-up">
-              <Button className="bg-teal-600 hover:bg-teal-700" data-testid="link-sign-up-nav">Get Started Free</Button>
+              <Button className="bg-teal-600 hover:bg-teal-700 font-medium" data-testid="link-sign-up-nav">Get Started Free</Button>
             </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <section className="pt-20 pb-16 bg-gradient-to-br from-teal-50 via-white to-blue-50 dark:from-zinc-950 dark:to-zinc-900">
+      <section className="pt-24 pb-28 bg-gradient-to-br from-teal-600 via-blue-600 to-indigo-700 text-white">
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 bg-white dark:bg-zinc-800 rounded-full px-4 py-1.5 mb-6 border">
-            <span className="text-emerald-600 text-xs">●</span>
-            <span className="text-sm font-medium">Built for Essential Workers</span>
+          <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur rounded-full px-5 py-2 mb-8 text-sm font-medium">
+            Built for Essential Workers
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-zinc-900 dark:text-white mb-6">
+          <h1 className="text-6xl md:text-7xl font-bold tracking-tighter mb-6">
             Swap shifts.<br />
-            <span className="text-teal-600">Cover gaps.</span><br />
-            Work on your terms.
+            Cover gaps.<br />
+            <span className="text-teal-200">Work on your terms.</span>
           </h1>
 
-          <p className="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-10">
-            The smartest way for nurses, retail workers, warehouse staff, and security guards to swap shifts, pick up extra hours, and balance life.
+          <p className="text-xl md:text-2xl text-teal-100 max-w-3xl mx-auto mb-10">
+            Connect nurses, retail workers, warehouse staff, and security guards who need coverage with those ready to pick up extra hours.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/sign-up">
-              <Button size="lg" className="text-lg px-10 py-7 bg-teal-600 hover:bg-teal-700 w-full sm:w-auto" data-testid="button-hero-cta">
+              <Button size="lg" className="text-lg px-10 py-7 bg-white text-teal-700 hover:bg-teal-50 w-full sm:w-auto" data-testid="button-hero-cta">
                 Start for Free
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
             <Link to="/pricing">
-              <Button size="lg" variant="outline" className="text-lg px-10 py-7 w-full sm:w-auto" data-testid="link-how-it-works-hero">
+              <Button size="lg" variant="outline" className="text-lg px-10 py-7 border-white text-white hover:bg-white/10 w-full sm:w-auto" data-testid="link-how-it-works-hero">
                 See How It Works
               </Button>
             </Link>
           </div>
-
-          <p className="text-sm text-zinc-500 mt-4">No credit card required • Free plan available</p>
         </div>
       </section>
 
-      {/* Stats */}
-      <div className="max-w-5xl mx-auto px-6 py-12 border-b">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      {/* Stats — floating card */}
+      <div className="max-w-6xl mx-auto px-6 -mt-8 relative z-10 mb-4">
+        <div className="bg-white dark:bg-zinc-900 rounded-3xl shadow-xl p-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
             { value: "12,400+", label: "Shifts covered" },
             { value: "8,200+", label: "Active workers" },
