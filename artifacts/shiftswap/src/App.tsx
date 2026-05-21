@@ -21,6 +21,7 @@ import PricingPage from "@/pages/PricingPage";
 import SettingsPage from "@/pages/SettingsPage";
 import SignInPage from "@/pages/SignInPage";
 import SignUpPage from "@/pages/SignUpPage";
+import AuthCallbackPage from "@/pages/AuthCallbackPage";
 
 initTheme();
 
@@ -69,6 +70,7 @@ function AppRoutes() {
         <Route path="/" component={HomeRedirect} />
         <Route path="/sign-in" component={SignInPage} />
         <Route path="/sign-up" component={SignUpPage} />
+        <Route path="/auth/callback" component={AuthCallbackPage} />
         <Route path="/dashboard">
           <Protected><DashboardPage /></Protected>
         </Route>
