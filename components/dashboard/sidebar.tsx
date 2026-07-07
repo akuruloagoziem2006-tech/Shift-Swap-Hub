@@ -24,6 +24,7 @@ import {
   ChevronRight,
   Shield,
   CheckSquare,
+  CalendarDays,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
@@ -68,6 +69,7 @@ export function DashboardSidebar() {
 
   const navigation = [
     { name: 'Home', href: '/dashboard', icon: Home },
+    { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
     { name: 'Browse Shifts', href: '/dashboard/browse', icon: Search },
     { name: 'Post a Shift', href: '/dashboard/post', icon: PlusCircle },
     { name: 'My Shifts', href: '/dashboard/my-shifts', icon: Calendar },
