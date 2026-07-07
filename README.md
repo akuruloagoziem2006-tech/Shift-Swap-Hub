@@ -177,6 +177,13 @@ CREATE TRIGGER on_auth_user_created
 | `/dashboard/post` | Post a new shift for swap |
 | `/dashboard/my-shifts` | View and manage your shifts |
 | `/dashboard/profile` | Edit your profile settings |
+| `/dashboard/manager` | Manager approval workflow (manager/admin only) |
+
+### User Roles
+
+- **Employee**: Browse shifts, request swaps, manage own shifts
+- **Manager**: All employee features + approve/reject swap requests
+- **Admin**: Full system access including user management
 
 ### Authentication
 
