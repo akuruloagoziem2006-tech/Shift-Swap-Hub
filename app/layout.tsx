@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import './globals.css';
-import { createClient } from '@/lib/supabase';
+import '@/globals.css';
 
 export const metadata: Metadata = {
   title: 'ShiftSwap',
