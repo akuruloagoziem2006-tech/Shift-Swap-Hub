@@ -19,10 +19,11 @@ import {
   PlusCircle,
   Calendar,
   User,
-  CreditCard,
   LogOut,
   Menu,
   ChevronRight,
+  Shield,
+  CheckSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
@@ -33,16 +34,8 @@ interface Profile {
   email: string
   full_name: string | null
   avatar_url: string | null
+  role: 'employee' | 'manager' | 'admin' | null
 }
-
-const navigation = [
-  { name: 'Home', href: '/dashboard', icon: Home },
-  { name: 'Browse Shifts', href: '/dashboard/browse', icon: Search },
-  { name: 'Post a Shift', href: '/dashboard/post', icon: PlusCircle },
-  { name: 'My Shifts', href: '/dashboard/my-shifts', icon: Calendar },
-  { name: 'Profile', href: '/dashboard/profile', icon: User },
-  { name: 'Pricing', href: '/dashboard/pricing', icon: CreditCard },
-]
 
 export function DashboardSidebar() {
   const pathname = usePathname()
@@ -70,6 +63,17 @@ export function DashboardSidebar() {
     await supabase.auth.signOut()
     router.push('/')
   }
+
+  const isManager = profile?.role === 'manager' || profile?.role === 'admin'
+
+  const navigation = [
+    { name: 'Home', href: '/dashboard', icon: Home },
+    { name: 'Browse Shifts', href: '/dashboard/browse', icon: Search },
+    { name: 'Post a Shift', href: '/dashboard/post', icon: PlusCircle },
+    { name: 'My Shifts', href: '/dashboard/my-shifts', icon: Calendar },
+    ...(isManager ? [{ name: 'Approvals', href: '/dashboard/manager', icon: CheckSquare }] : []),
+    { name: 'Profile', href: '/dashboard/profile', icon: User },
+  ]
 
   const NavLinks = ({ onNavigate }: { onNavigate?: () => void }) => (
     <nav className="flex-1 space-y-1 px-2 py-4">
@@ -113,7 +117,7 @@ export function DashboardSidebar() {
                 {profile?.full_name || 'User'}
               </p>
               <p className="text-xs text-muted-foreground truncate">
-                {profile?.email || ''}
+                {isManager ? 'Manager' : 'Employee'}
               </p>
             </div>
           </Button>
@@ -125,6 +129,14 @@ export function DashboardSidebar() {
               Profile
             </Link>
           </DropdownMenuItem>
+          {isManager && (
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/manager">
+                <Shield className="mr-2 size-4" />
+                Manager Panel
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout} className="text-destructive">
             <LogOut className="mr-2 size-4" />
