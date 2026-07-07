@@ -6,48 +6,68 @@ export async function middleware(request: NextRequest) {
     request,
   })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          )
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
-          )
-        },
-      },
-    },
-  )
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Protect dashboard routes
-  if (
-    !user &&
-    request.nextUrl.pathname.startsWith('/dashboard')
-  ) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
+  // Skip auth check if Supabase is not configured (placeholder values)
+  if (!supabaseUrl || !supabaseAnonKey || 
+      supabaseUrl.includes('placeholder') || 
+      supabaseAnonKey.includes('placeholder')) {
+    // Allow access to auth pages only, redirect dashboard to login
+    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/login'
+      return NextResponse.redirect(url)
+    }
+    return supabaseResponse
   }
 
-  // Redirect logged-in users away from auth pages
-  if (user && request.nextUrl.pathname.startsWith('/auth/login')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+  try {
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value),
+            )
+            supabaseResponse = NextResponse.next({
+              request,
+            })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options),
+            )
+          },
+        },
+      },
+    )
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    // Protect dashboard routes
+    if (
+      !user &&
+      request.nextUrl.pathname.startsWith('/dashboard')
+    ) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/login'
+      return NextResponse.redirect(url)
+    }
+
+    // Redirect logged-in users away from auth pages
+    if (user && request.nextUrl.pathname.startsWith('/auth/login')) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
+  } catch (error) {
+    console.error('Middleware error:', error)
   }
 
   return supabaseResponse
