@@ -10,6 +10,7 @@ A modern shift swap management platform for essential workers. Built with Next.j
 - **Post Shifts** - Offer your shifts for others to pick up
 - **Request Swaps** - Send swap requests to colleagues
 - **Manager Approval** - Built-in approval workflow for managers
+- **Interactive Calendar** - Visual monthly calendar with all shifts
 - **Real-time Updates** - Live shift status updates via Supabase
 - **Responsive Design** - Works on desktop and mobile devices
 - **Dark Mode** - Modern dark theme optimized for night shifts
@@ -173,6 +174,7 @@ CREATE TRIGGER on_auth_user_created
 | Route | Description |
 |-------|-------------|
 | `/dashboard` | Main dashboard with overview stats |
+| `/dashboard/calendar` | Interactive calendar view of all shifts |
 | `/dashboard/browse` | Browse and filter available shifts |
 | `/dashboard/post` | Post a new shift for swap |
 | `/dashboard/my-shifts` | View and manage your shifts |
@@ -253,6 +255,28 @@ MIT License - see LICENSE file for details.
 
 ### Mobile View
 ![Mobile](https://via.placeholder.com/400x800/1a1a1a/14b8a6?text=Mobile+View)
+
+---
+
+## Remaining Todos
+
+### High Priority
+- [ ] Email notifications when swap requests are sent/approved/rejected
+- [ ] User management page for admins
+- [ ] Real-time subscriptions for live updates
+
+### Medium Priority
+- [ ] Chat/messaging between users
+- [ ] Shift conflict detection
+- [ ] Mobile app (React Native or PWA)
+- [ ] Analytics dashboard for managers
+
+### Nice to Have
+- [ ] Export shifts to calendar (ICS)
+- [ ] Shift reminders/notifications
+- [ ] Custom shift categories
+- [ ] Multi-location support
+- [ ] Shift trading marketplace
 
 ---
 
