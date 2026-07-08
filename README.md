@@ -57,18 +57,18 @@ shift-swap-hub/
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory:
+**✅ Already configured** - The `.env.local` file has been set up with your Supabase project credentials.
+
+If you need to update them manually, create a `.env.local` file:
 
 ```env
 # Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://qvizpavpwezozwupvxxt.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-
-# Optional: Supabase Service Role Key (server-side only)
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-Copy the example file:
+Or copy from the example:
 ```bash
 cp .env.example .env.local
 ```
@@ -85,7 +85,15 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-### Database Setup
+### Database Setup ⚠️
+
+**⚠️ Important:** Before using the app, you must create the database tables in Supabase:
+
+1. Go to [Supabase SQL Editor](https://supabase.com/dashboard/project/qvizpavpwezozwupvxxt/sql/new)
+2. Copy and paste the SQL below
+3. Click "Run" to execute
+
+Alternatively, use the prepared SQL file: [`SETUP_DATABASE.sql`](./SETUP_DATABASE.sql)
 
 Run the following SQL in your Supabase SQL Editor to create the required tables:
 
