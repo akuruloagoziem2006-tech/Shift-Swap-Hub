@@ -6,32 +6,29 @@ A modern shift swap management platform for essential workers. Built with Next.j
 
 ---
 
-## 🚀 Deployment Status: Ready
+## 🚀 Production Ready
 
-**App is configured and ready for deployment.**
-
-### Quick Start (After Database Setup)
-
-1. Run the SQL setup script (see below)
-2. Start the dev server: `npm run dev`
-3. Visit http://localhost:3000
+**This app is ready for deployment.** Follow the setup steps below.
 
 ---
 
 ## Features
 
-- **Browse Available Shifts** - View all open shifts available for swap
-- **Post Shifts** - Offer your shifts for others to pick up
-- **Request Swaps** - Send swap requests to colleagues
-- **Manager Approval** - Built-in approval workflow for managers
-- **Interactive Calendar** - Visual monthly calendar with all shifts
-- **Real-time Updates** - Live shift status updates via Supabase
-- **Responsive Design** - Works on desktop and mobile devices
-- **Dark Mode** - Modern dark theme optimized for night shifts
+| Feature | Description |
+|---------|-------------|
+| 🔐 **Authentication** | Supabase Auth with email/password login |
+| 📅 **Browse Shifts** | Filter and search available shifts by date, department, position |
+| 📝 **Post Shifts** | Offer your shifts for swap with details |
+| 🔄 **Request Swaps** | Send swap requests to shift owners |
+| ✅ **Manager Approval** | Managers can approve/reject swap requests |
+| 📆 **Calendar View** | Visual monthly calendar with all shifts |
+| 👤 **User Profiles** | Manage profile, department, and preferences |
+| 🌙 **Dark Mode** | Modern dark theme optimized for night shifts |
+| 📱 **Responsive** | Works on desktop and mobile devices |
 
 ## Tech Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router + Turbopack)
 - **UI Components**: [shadcn/ui](https://ui.shadcn.com/) + Radix UI
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
 - **Database**: [Supabase](https://supabase.com/) (PostgreSQL)
@@ -43,22 +40,25 @@ A modern shift swap management platform for essential workers. Built with Next.j
 
 ```
 shift-swap-hub/
-├── app/                      # Next.js App Router pages
-│   ├── api/                 # API routes
-│   ├── auth/                # Authentication pages
+├── app/
+│   ├── api/                 # API routes (shifts, swap-requests, auth)
+│   ├── auth/                # Login, signup pages
 │   ├── dashboard/           # Protected dashboard pages
-│   ├── layout.tsx           # Root layout
+│   │   ├── calendar/         # Interactive calendar view
+│   │   ├── manager/          # Manager approval workflow
+│   │   ├── browse/           # Browse available shifts
+│   │   ├── post/             # Post new shift
+│   │   ├── my-shift/         # Manage own shifts
+│   │   └── profile/         # User profile
 │   └── page.tsx             # Landing page
-├── components/
-│   ├── ui/                  # shadcn/ui components
-│   ├── dashboard/           # Dashboard-specific components
-│   └── layout/              # Layout components
-├── lib/                     # Utilities and configs
+├── components/ui/           # shadcn/ui components
+├── lib/
 │   ├── supabase/            # Supabase client helpers
 │   ├── types.ts             # TypeScript types
 │   └── utils.ts             # Utility functions
-├── middleware.ts            # Auth middleware
+├── proxy.ts                 # Auth middleware (Next.js 16)
 ├── SETUP_DATABASE.sql       # Database setup script
+├── .env.example             # Environment variables template
 └── package.json
 ```
 
@@ -67,25 +67,17 @@ shift-swap-hub/
 ### Prerequisites
 
 - Node.js 20+
-- pnpm 8+
-- A Supabase project
+- npm or pnpm
+- A [Supabase](https://supabase.com/) project
 
 ### Environment Variables
 
-**✅ Already configured** - The `.env.local` file has been set up with your Supabase project credentials.
-
-If you need to update them manually, create a `.env.local` file:
+Create a `.env.local` file (copy from `.env.example`):
 
 ```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://qvizpavpwezozwupvxxt.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-```
-
-Or copy from the example:
-```bash
-cp .env.example .env.local
 ```
 
 ### Installation
@@ -260,56 +252,84 @@ The app uses Supabase Auth with email magic links and OAuth providers. Protected
 
 ## Deployment
 
-### 🚀 Deployment Checklist
+### 🚀 Production Deployment Checklist
 
-Before deploying, ensure you have:
+Before deploying, complete these steps:
 
 - [x] Supabase project created
-- [x] Environment variables configured in `.env.local`
-- [ ] **Database tables created** (run SQL from `SETUP_DATABASE.sql`)
-- [ ] Supabase Auth configured (email/password or OAuth)
+- [x] Environment variables configured
+- [ ] **Database tables created** (run `SETUP_DATABASE.sql`)
+- [ ] Supabase Auth configured (email/password enabled)
 - [ ] Environment variables added to hosting platform
 
-### Vercel (Recommended)
+### Deploy to Vercel
 
-1. Push your code to GitHub
-2. Import project to [Vercel](https://vercel.com)
-3. Add these environment variables in Vercel dashboard:
-   - `NEXT_PUBLIC_SUPABASE_URL` = `https://qvizpavpwezozwupvxxt.supabase.co`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your anon key
-   - `SUPABASE_SERVICE_ROLE_KEY` = your service role key
-4. Deploy!
+1. **Push to GitHub:**
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin main
+   ```
+
+2. **Import to Vercel:**
+   - Go to [vercel.com](https://vercel.com)
+   - Click "Add New Project"
+   - Import from GitHub
+   - Select this repository
+
+3. **Add Environment Variables in Vercel:**
+   
+   | Variable | Value |
+   |----------|-------|
+   | `NEXT_PUBLIC_SUPABASE_URL` | `https://qvizpavpwezozwupvxxt.supabase.co` |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (from Supabase Settings > API) |
+   | `SUPABASE_SERVICE_ROLE_KEY` | (from Supabase Settings > API) |
+
+4. **Deploy!**
+
+### Using Vercel CLI
 
 ```bash
-# Using Vercel CLI
+# Install Vercel CLI
+npm i -g vercel
+
+# Login
+vercel login
+
+# Deploy preview
 vercel
-vercel --prod  # Production deployment
+
+# Deploy to production
+vercel --prod
 ```
 
 ### Manual Deployment
 
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
-# Build the project
-pnpm build
+# Build for production
+npm run build
 
 # Start production server
-pnpm start
+npm start
 ```
 
 ### Post-Deployment Setup
 
 1. **Create Database Tables:**
-   - Go to Supabase SQL Editor
-   - Run the SQL from `SETUP_DATABASE.sql`
+   - Go to [Supabase SQL Editor](https://supabase.com/dashboard/project/qvizpavpwezozwupvxxt/sql/new)
+   - Run the SQL from [`SETUP_DATABASE.sql`](./SETUP_DATABASE.sql)
 
-2. **Set Up First Manager:**
-   - Sign up/log in as the first user
-   - In Supabase dashboard, manually update their role to 'manager':
+2. **Configure Supabase Auth:**
+   - Go to Supabase Dashboard > Authentication
+   - Enable Email/Password provider
+   - Configure redirect URLs for your domain
+
+3. **Set Up First Manager:**
    ```sql
-   UPDATE profiles SET role = 'manager' WHERE email = 'your-email@example.com';
+   UPDATE profiles SET role = 'manager' WHERE email = 'admin@example.com';
    ```
 
 ## Scripts
