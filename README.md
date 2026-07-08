@@ -4,6 +4,20 @@ A modern shift swap management platform for essential workers. Built with Next.j
 
 ![ShiftSwap](https://via.placeholder.com/1200x630/1a1a1a/14b8a6?text=ShiftSwap+Hub)
 
+---
+
+## 🚀 Deployment Status: Ready
+
+**App is configured and ready for deployment.**
+
+### Quick Start (After Database Setup)
+
+1. Run the SQL setup script (see below)
+2. Start the dev server: `npm run dev`
+3. Visit http://localhost:3000
+
+---
+
 ## Features
 
 - **Browse Available Shifts** - View all open shifts available for swap
@@ -44,6 +58,7 @@ shift-swap-hub/
 │   ├── types.ts             # TypeScript types
 │   └── utils.ts             # Utility functions
 ├── middleware.ts            # Auth middleware
+├── SETUP_DATABASE.sql       # Database setup script
 └── package.json
 ```
 
@@ -245,11 +260,24 @@ The app uses Supabase Auth with email magic links and OAuth providers. Protected
 
 ## Deployment
 
+### 🚀 Deployment Checklist
+
+Before deploying, ensure you have:
+
+- [x] Supabase project created
+- [x] Environment variables configured in `.env.local`
+- [ ] **Database tables created** (run SQL from `SETUP_DATABASE.sql`)
+- [ ] Supabase Auth configured (email/password or OAuth)
+- [ ] Environment variables added to hosting platform
+
 ### Vercel (Recommended)
 
 1. Push your code to GitHub
 2. Import project to [Vercel](https://vercel.com)
-3. Add environment variables in Vercel dashboard
+3. Add these environment variables in Vercel dashboard:
+   - `NEXT_PUBLIC_SUPABASE_URL` = `https://qvizpavpwezozwupvxxt.supabase.co`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your anon key
+   - `SUPABASE_SERVICE_ROLE_KEY` = your service role key
 4. Deploy!
 
 ```bash
@@ -261,12 +289,28 @@ vercel --prod  # Production deployment
 ### Manual Deployment
 
 ```bash
+# Install dependencies
+pnpm install
+
 # Build the project
 pnpm build
 
 # Start production server
 pnpm start
 ```
+
+### Post-Deployment Setup
+
+1. **Create Database Tables:**
+   - Go to Supabase SQL Editor
+   - Run the SQL from `SETUP_DATABASE.sql`
+
+2. **Set Up First Manager:**
+   - Sign up/log in as the first user
+   - In Supabase dashboard, manually update their role to 'manager':
+   ```sql
+   UPDATE profiles SET role = 'manager' WHERE email = 'your-email@example.com';
+   ```
 
 ## Scripts
 

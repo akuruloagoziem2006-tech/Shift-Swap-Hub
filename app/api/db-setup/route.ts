@@ -7,13 +7,14 @@ export async function POST() {
     return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY not configured' }, { status: 500 });
   }
 
+  // Use Supabase direct connection format
   const client = new Client({
-    host: 'qvizpavpwezozwupvxxt.supabase.co',
+    host: 'db.qvizpavpwezozwupvxxt.supabase.co',
     port: 5432,
     database: 'postgres',
     user: 'postgres',
     password: supabasePassword,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
