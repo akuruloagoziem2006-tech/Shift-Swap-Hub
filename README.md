@@ -258,7 +258,8 @@ Before deploying, complete these steps:
 
 - [x] Supabase project created
 - [x] Environment variables configured
-- [ ] **Database tables created** (run `SETUP_DATABASE.sql`)
+- [x] **Code pushed to GitHub** ✅
+- [ ] **Database tables created** (run `SETUP_DATABASE.sql` in Supabase SQL Editor)
 - [ ] Supabase Auth configured (email/password enabled)
 - [ ] Environment variables added to hosting platform
 
