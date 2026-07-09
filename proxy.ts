@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Named export for Next.js 16+ compatibility
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -16,7 +17,7 @@ export async function proxy(request: NextRequest) {
     // Allow access to auth pages only, redirect dashboard to login
     if (request.nextUrl.pathname.startsWith('/dashboard')) {
       const url = request.nextUrl.clone()
-      url.pathname = '/auth/login'
+      url.pathname = '/auth'
       return NextResponse.redirect(url)
     }
     return supabaseResponse
@@ -50,18 +51,22 @@ export async function proxy(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
-    // Protect dashboard routes
+    // Protect dashboard routes - redirect to auth page
     if (
       !user &&
       request.nextUrl.pathname.startsWith('/dashboard')
     ) {
       const url = request.nextUrl.clone()
-      url.pathname = '/auth/login'
+      url.pathname = '/auth'
       return NextResponse.redirect(url)
     }
 
-    // Redirect logged-in users away from auth pages
-    if (user && request.nextUrl.pathname.startsWith('/auth/login')) {
+    // Redirect logged-in users away from auth pages to dashboard
+    if (user && (
+      request.nextUrl.pathname.startsWith('/auth/login') ||
+      request.nextUrl.pathname.startsWith('/auth/signup') ||
+      request.nextUrl.pathname === '/auth'
+    )) {
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'
       return NextResponse.redirect(url)
