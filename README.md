@@ -16,7 +16,7 @@ A modern shift swap management platform for essential workers. Built with Next.j
 
 | Feature | Description |
 |---------|-------------|
-| 🔐 **Authentication** | Supabase Auth with email/password login |
+| 🔐 **Authentication** | Supabase Auth with email/password, social login (Google, GitHub) |
 | 📅 **Browse Shifts** | Filter and search available shifts by date, department, position |
 | 📝 **Post Shifts** | Offer your shifts for swap with details |
 | 🔄 **Request Swaps** | Send swap requests to shift owners |
@@ -248,7 +248,30 @@ INSERT INTO shifts (user_id, date, start_time, end_time, position, department, l
 
 ### Authentication
 
-The app uses Supabase Auth with email magic links and OAuth providers. Protected routes are handled by middleware.
+The app uses Supabase Auth with multiple authentication methods:
+
+#### Email/Password
+- Sign up with email and password (minimum 8 characters)
+- Sign in with credentials
+- Password reset via email
+
+#### Social Login (OAuth)
+- **Google**: Click "Google" button on auth page
+- **GitHub**: Click "GitHub" button on auth page
+
+#### Setup Social Login in Supabase
+
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
+2. Navigate to **Authentication** → **Providers**
+3. Enable **Google** or **GitHub**
+4. Enter your OAuth credentials
+5. Add callback URL to your OAuth app settings:
+   - Google: `https://your-project.supabase.co/auth/v1/callback`
+   - GitHub: `https://your-project.supabase.co/auth/v1/callback`
+
+#### Protected Routes
+
+All `/dashboard/*` routes are protected by middleware. Unauthenticated users are redirected to `/auth`.
 
 ## Deployment
 
