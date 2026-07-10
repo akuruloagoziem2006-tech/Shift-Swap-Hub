@@ -10,6 +10,12 @@ A modern shift swap management platform for essential workers. Built with Next.j
 
 **This app is ready for deployment.** Follow the setup steps below.
 
+### Live Demo
+
+> ⚠️ **Note:** Replace with your Vercel deployment URL after deploying.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/akuruloagoziem2006-tech/Shift-Swap-Hub)
+
 ---
 
 ## Features
@@ -236,8 +242,8 @@ INSERT INTO shifts (user_id, date, start_time, end_time, position, department, l
 | `/dashboard/calendar` | Interactive calendar view of all shifts |
 | `/dashboard/browse` | Browse and filter available shifts |
 | `/dashboard/post` | Post a new shift for swap |
-| `/dashboard/my-shifts` | View and manage your shifts |
-| `/dashboard/profile` | Edit your profile settings |
+| `/dashboard/my-shift` | View and manage your shifts |
+| `/dashboard/profile` | Edit your profile (name, role, department) |
 | `/dashboard/manager` | Manager approval workflow (manager/admin only) |
 
 ### User Roles
@@ -281,10 +287,12 @@ Before deploying, complete these steps:
 
 - [x] Supabase project created
 - [x] Environment variables configured
-- [x] **Code pushed to GitHub** ✅
+- [x] Code pushed to GitHub ✅
+- [x] Middleware protecting dashboard routes ✅
+- [x] Unified auth page with social login ✅
 - [ ] **Database tables created** (run `SETUP_DATABASE.sql` in Supabase SQL Editor)
-- [ ] Supabase Auth configured (email/password enabled)
-- [ ] Environment variables added to hosting platform
+- [ ] Supabase Auth configured (email/password + OAuth providers)
+- [ ] Environment variables added to Vercel
 
 ### Deploy to Vercel
 
