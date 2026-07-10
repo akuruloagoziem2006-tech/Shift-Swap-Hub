@@ -10,9 +10,26 @@ A modern shift swap management platform for essential workers. Built with Next.j
 
 **This app is ready for deployment.** Follow the setup steps below.
 
+### Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/akuruloagoziem2006-tech/Shift-Swap-Hub.git
+cd Shift-Swap-Hub
+
+# Install dependencies
+pnpm install
+
+# Copy environment variables
+cp .env.example .env.local
+
+# Start development server
+pnpm dev
+```
+
 ### Live Demo
 
-> ⚠️ **Note:** Replace with your Vercel deployment URL after deploying.
+> ⚠️ **Note:** Deploy to Vercel and add your deployment URL here.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/akuruloagoziem2006-tech/Shift-Swap-Hub)
 
@@ -76,7 +93,20 @@ shift-swap-hub/
 - npm or pnpm
 - A [Supabase](https://supabase.com/) project
 
-### Environment Variables
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/akuruloagoziem2006-tech/Shift-Swap-Hub.git
+cd Shift-Swap-Hub
+```
+
+### 2. Install Dependencies
+
+```bash
+pnpm install
+```
+
+### 3. Configure Environment Variables
 
 Create a `.env.local` file (copy from `.env.example`):
 
@@ -86,13 +116,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-### Installation
+### 4. Set Up Supabase
+
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard) → **SQL Editor**
+2. Run the database setup script from [`SETUP_DATABASE.sql`](./SETUP_DATABASE.sql)
+3. Go to **Authentication** → **Providers** → Enable **Email/Password**
+
+### 5. Run Development Server
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Start development server
 pnpm dev
 ```
 
@@ -102,135 +134,16 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 **⚠️ Important:** Before using the app, you must create the database tables in Supabase:
 
-1. Go to [Supabase SQL Editor](https://supabase.com/dashboard/project/qvizpavpwezozwupvxxt/sql/new)
-2. Copy and paste the SQL below
+1. Go to [Supabase SQL Editor](https://supabase.com/dashboard)
+2. Copy and paste the SQL from [`SETUP_DATABASE.sql`](./SETUP_DATABASE.sql)
 3. Click "Run" to execute
 
-Alternatively, use the prepared SQL file: [`SETUP_DATABASE.sql`](./SETUP_DATABASE.sql)
+The SQL creates:
+- `profiles` - User profiles with roles
+- `shifts` - Shift information
+- `shift_swap_requests` - Swap request tracking
 
-Run the following SQL in your Supabase SQL Editor to create the required tables:
-
-```sql
--- ============================================
--- SHIFT-SWAP-HUB DATABASE SCHEMA
--- Run this in Supabase SQL Editor
--- ============================================
-
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Profiles table (extends auth.users)
-CREATE TABLE IF NOT EXISTS profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  email TEXT NOT NULL,
-  full_name TEXT,
-  avatar_url TEXT,
-  role TEXT DEFAULT 'employee' CHECK (role IN ('employee', 'manager', 'admin')),
-  department TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Shifts table
-CREATE TABLE IF NOT EXISTS shifts (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  date DATE NOT NULL,
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
-  position TEXT NOT NULL,
-  department TEXT NOT NULL,
-  location TEXT,
-  notes TEXT,
-  status TEXT DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'open', 'filled', 'completed', 'cancelled')),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Shift swap requests table
-CREATE TABLE IF NOT EXISTS shift_swap_requests (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  shift_id UUID REFERENCES shifts(id) ON DELETE CASCADE NOT NULL,
-  requester_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  target_user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'cancelled')),
-  message TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Enable Row Level Security
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shifts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shift_swap_requests ENABLE ROW LEVEL SECURITY;
-
--- Create policies for profiles
-DROP POLICY IF EXISTS "Users can view all profiles" ON profiles;
-CREATE POLICY "Users can view all profiles" ON profiles FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
-CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
-CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
-
--- Create policies for shifts
-DROP POLICY IF EXISTS "Users can view shifts" ON shifts;
-CREATE POLICY "Users can view shifts" ON shifts FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Users can create shifts" ON shifts;
-CREATE POLICY "Users can create shifts" ON shifts FOR INSERT WITH CHECK (auth.uid() = user_id);
-DROP POLICY IF EXISTS "Users can update own shifts" ON shifts;
-CREATE POLICY "Users can update own shifts" ON shifts FOR UPDATE USING (auth.uid() = user_id);
-DROP POLICY IF EXISTS "Managers can update any shifts" ON shifts;
-CREATE POLICY "Managers can update any shifts" ON shifts FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('manager', 'admin'))
-);
-
--- Create policies for swap requests
-DROP POLICY IF EXISTS "Users can view swap requests" ON shift_swap_requests;
-CREATE POLICY "Users can view swap requests" ON shift_swap_requests FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Users can create swap requests" ON shift_swap_requests;
-CREATE POLICY "Users can create swap requests" ON shift_swap_requests FOR INSERT WITH CHECK (auth.uid() = requester_id);
-DROP POLICY IF EXISTS "Users can update own requests" ON shift_swap_requests;
-CREATE POLICY "Users can update own requests" ON shift_swap_requests FOR UPDATE USING (auth.uid() = requester_id);
-DROP POLICY IF EXISTS "Managers can update any requests" ON shift_swap_requests;
-CREATE POLICY "Managers can update any requests" ON shift_swap_requests FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('manager', 'admin'))
-);
-
--- Trigger to create profile on user signup
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-DROP FUNCTION IF EXISTS public.handle_new_user();
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, full_name, avatar_url)
-  VALUES (
-    new.id,
-    new.email,
-    new.raw_user_meta_data->>'full_name',
-    new.raw_user_meta_data->>'avatar_url'
-  );
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- ============================================
--- SAMPLE DATA (Optional - for testing)
--- ============================================
-
--- Insert sample shifts (uncomment and modify as needed)
--- Note: Replace 'YOUR_USER_ID' with an actual user ID from auth.users
-
-/*
-INSERT INTO shifts (user_id, date, start_time, end_time, position, department, location, status) VALUES
-  ('YOUR_USER_ID', CURRENT_DATE + 1, '09:00', '17:00', 'Cashier', 'Retail', 'Downtown Store', 'scheduled'),
-  ('YOUR_USER_ID', CURRENT_DATE + 3, '14:00', '22:00', 'Cashier', 'Retail', 'Mall Location', 'open'),
-  ('YOUR_USER_ID', CURRENT_DATE + 5, '08:00', '16:00', 'Nurse', 'Healthcare', 'City Hospital', 'scheduled');
-*/
-```
+See [`SETUP_DATABASE.sql`](./SETUP_DATABASE.sql) for the complete SQL script.
 
 ## Features Overview
 

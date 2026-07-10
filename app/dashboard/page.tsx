@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Calendar, Users, Clock, TrendingUp, ArrowRight, PlusCircle } from 'lucide-react'
+import { Calendar, Users, Clock, TrendingUp, ArrowRight, PlusCircle, Sparkles, X } from 'lucide-react'
 import type { Profile, Shift, ShiftSwapRequest } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
 
@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [myShifts, setMyShifts] = useState<Shift[]>([])
   const [pendingRequests, setPendingRequests] = useState<ShiftSwapRequest[]>([])
   const [loading, setLoading] = useState(true)
+  const [showWelcome, setShowWelcome] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
@@ -36,6 +37,11 @@ export default function Dashboard() {
           .eq('id', authUser.id)
           .single()
         setUser(profile)
+
+        // Check if first-time user (no full_name set)
+        if (profile && !profile.full_name) {
+          setShowWelcome(true)
+        }
 
         // Get open shifts (available for swap)
         const { data: shifts } = await supabase
@@ -135,6 +141,47 @@ export default function Dashboard() {
         </h1>
         <p className="text-zinc-400">Here's what's happening with your shifts today</p>
       </div>
+
+      {/* Welcome Banner for First-Time Users */}
+      {showWelcome && (
+        <div className="mb-8 bg-gradient-to-r from-teal-500/10 to-teal-600/10 border border-teal-500/20 rounded-xl p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-teal-500/20 rounded-lg">
+                <Sparkles className="h-6 w-6 text-teal-500" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">
+                  👋 Welcome to ShiftSwap!
+                </h2>
+                <p className="text-zinc-300 mb-4">
+                  Get started by setting up your profile. This helps colleagues recognize you when swapping shifts.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild className="bg-teal-600 hover:bg-teal-700">
+                    <Link href="/dashboard/profile">
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Complete Profile
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                    <Link href="/dashboard/post">
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Post Your First Shift
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowWelcome(false)}
+              className="text-zinc-500 hover:text-zinc-300"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
