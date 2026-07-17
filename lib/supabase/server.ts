@@ -16,7 +16,8 @@ export async function createClient() {
           try {
             cookieStore.setAll(cookiesToSet)
           } catch {
-            // The "setAll" method was called from a Server Component.
+            // The `setAll` method was called from a Server Component.
+            // This is expected behavior in Next.js 13+ with Server Components.
           }
         },
       },

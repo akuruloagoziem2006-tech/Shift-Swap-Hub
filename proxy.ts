@@ -10,12 +10,20 @@ export async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+  // Get the pathname for route checks
+  const { pathname } = request.nextUrl
+
+  // Allow callback route to pass through without redirecting authenticated users
+  if (pathname === '/auth/callback') {
+    return supabaseResponse
+  }
+
   // Skip auth check if Supabase is not configured (placeholder values)
   if (!supabaseUrl || !supabaseAnonKey || 
       supabaseUrl.includes('placeholder') || 
       supabaseAnonKey.includes('placeholder')) {
     // Allow access to auth pages only, redirect dashboard to login
-    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    if (pathname.startsWith('/dashboard')) {
       const url = request.nextUrl.clone()
       url.pathname = '/auth'
       return NextResponse.redirect(url)
@@ -47,32 +55,27 @@ export async function proxy(request: NextRequest) {
       },
     )
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    // Refresh the session - this is critical for OAuth callbacks
+    const { data: { user }, error } = await supabase.auth.getUser()
+
+    // Define protected and auth routes
+    const isProtectedRoute = pathname.startsWith('/dashboard')
+    const isAuthRoute = pathname.startsWith('/auth')
 
     // Protect dashboard routes - redirect to auth page
-    if (
-      !user &&
-      request.nextUrl.pathname.startsWith('/dashboard')
-    ) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/auth'
-      return NextResponse.redirect(url)
+    if (isProtectedRoute && !user && !error) {
+      const redirectUrl = new URL('/auth', request.url)
+      redirectUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(redirectUrl)
     }
 
     // Redirect logged-in users away from auth pages to dashboard
-    if (user && (
-      request.nextUrl.pathname.startsWith('/auth/login') ||
-      request.nextUrl.pathname.startsWith('/auth/signup') ||
-      request.nextUrl.pathname === '/auth'
-    )) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/dashboard'
-      return NextResponse.redirect(url)
+    if (isAuthRoute && user && pathname !== '/auth/callback') {
+      const redirectUrl = new URL('/dashboard', request.url)
+      return NextResponse.redirect(redirectUrl)
     }
   } catch (error) {
-    console.error('Middleware error:', error)
+    console.error('Proxy error:', error)
   }
 
   return supabaseResponse
