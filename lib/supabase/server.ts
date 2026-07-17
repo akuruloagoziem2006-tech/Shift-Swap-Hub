@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
@@ -14,7 +14,9 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
-            cookieStore.setAll(cookiesToSet)
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options as CookieOptions)
+            })
           } catch {
             // The `setAll` method was called from a Server Component.
             // This is expected behavior in Next.js 13+ with Server Components.

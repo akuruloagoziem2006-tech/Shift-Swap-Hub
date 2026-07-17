@@ -1,27 +1,21 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Named export for Next.js 16+ compatibility
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  // Allow auth callback route to pass through (critical for OAuth)
-  // This route exchanges code for session and sets cookies
+  // Allow auth callback route to pass through without any auth checks
+  // This route handles the OAuth code exchange
   if (pathname.startsWith('/auth/callback')) {
     return NextResponse.next({ request })
   }
 
-  // Skip auth check if Supabase is not configured
+  // Skip auth check if Supabase is not configured properly
   if (!supabaseUrl || !supabaseAnonKey || 
       supabaseUrl.includes('placeholder') || 
       supabaseAnonKey.includes('placeholder')) {
-    if (pathname.startsWith('/dashboard')) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/auth'
-      return NextResponse.redirect(url)
-    }
     return NextResponse.next({ request })
   }
 
@@ -49,26 +43,18 @@ export async function proxy(request: NextRequest) {
       },
     )
 
-    // Refresh session - critical for OAuth flow
-    const { data: { user } } = await supabase.auth.getUser()
+    // Try to get user - this will use existing cookies
+    const { data: { user }, error } = await supabase.auth.getUser()
 
-    // Define route types
-    const isDashboardRoute = pathname.startsWith('/dashboard')
-    const isAuthRoute = pathname.startsWith('/auth')
-    const isApiRoute = pathname.startsWith('/api')
-
-    // Protect dashboard routes - redirect to auth if not authenticated
-    if (isDashboardRoute && !user) {
+    // Protect dashboard routes - redirect to /auth if not logged in
+    if (pathname.startsWith('/dashboard') && !user) {
       const url = new URL('/auth', request.url)
       url.searchParams.set('redirect', pathname)
       return NextResponse.redirect(url)
     }
 
-    // Redirect authenticated users from auth pages to dashboard
-    // But only if not in the middle of OAuth flow
-    if (isAuthRoute && user && !isApiRoute) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
+    // Let the auth page handle redirecting logged-in users
+    // Don't redirect here - let the client-side handle it
   } catch (error) {
     console.error('Proxy error:', error)
   }

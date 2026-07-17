@@ -18,7 +18,6 @@ function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
-  const [mounted, setMounted] = useState(false);
 
   // Form states
   const [mode, setMode] = useState<AuthMode>('signin');
@@ -32,13 +31,11 @@ function AuthPageContent() {
 
   // Check for tab parameter and error in URL (from OAuth callback)
   useEffect(() => {
-    setMounted(true);
-    
     // Check if user is already logged in - redirect to dashboard
     async function checkUser() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       }
     }
     checkUser();
@@ -53,7 +50,7 @@ function AuthPageContent() {
     if (errorParam) {
       setError(decodeURIComponent(errorDescription || 'Authentication failed. Please try again.'));
     }
-  }, [searchParams, supabase, router]);
+  }, [searchParams, supabase]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,8 +61,8 @@ function AuthPageContent() {
     if (error) {
       setError(getErrorMessage(error.message));
     } else {
-      router.push('/dashboard');
-      router.refresh();
+      // Use full page reload to ensure cookies are properly set
+      window.location.href = '/dashboard';
     }
     setLoading(false);
   };
