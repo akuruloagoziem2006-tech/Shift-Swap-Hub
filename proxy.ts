@@ -3,33 +3,29 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 // Named export for Next.js 16+ compatibility
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
-
+  const { pathname } = request.nextUrl
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  // Get the pathname for route checks
-  const { pathname } = request.nextUrl
-
-  // Allow callback route to pass through without redirecting authenticated users
-  if (pathname === '/auth/callback') {
-    return supabaseResponse
+  // Allow auth callback route to pass through (critical for OAuth)
+  // This route exchanges code for session and sets cookies
+  if (pathname.startsWith('/auth/callback')) {
+    return NextResponse.next({ request })
   }
 
-  // Skip auth check if Supabase is not configured (placeholder values)
+  // Skip auth check if Supabase is not configured
   if (!supabaseUrl || !supabaseAnonKey || 
       supabaseUrl.includes('placeholder') || 
       supabaseAnonKey.includes('placeholder')) {
-    // Allow access to auth pages only, redirect dashboard to login
     if (pathname.startsWith('/dashboard')) {
       const url = request.nextUrl.clone()
       url.pathname = '/auth'
       return NextResponse.redirect(url)
     }
-    return supabaseResponse
+    return NextResponse.next({ request })
   }
+
+  let supabaseResponse = NextResponse.next({ request })
 
   try {
     const supabase = createServerClient(
@@ -41,38 +37,37 @@ export async function proxy(request: NextRequest) {
             return request.cookies.getAll()
           },
           setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value),
-            )
-            supabaseResponse = NextResponse.next({
-              request,
+            cookiesToSet.forEach(({ name, value }) => {
+              request.cookies.set(name, value)
             })
-            cookiesToSet.forEach(({ name, value, options }) =>
-              supabaseResponse.cookies.set(name, value, options),
-            )
+            supabaseResponse = NextResponse.next({ request })
+            cookiesToSet.forEach(({ name, value, options }) => {
+              supabaseResponse.cookies.set(name, value, options)
+            })
           },
         },
       },
     )
 
-    // Refresh the session - this is critical for OAuth callbacks
-    const { data: { user }, error } = await supabase.auth.getUser()
+    // Refresh session - critical for OAuth flow
+    const { data: { user } } = await supabase.auth.getUser()
 
-    // Define protected and auth routes
-    const isProtectedRoute = pathname.startsWith('/dashboard')
+    // Define route types
+    const isDashboardRoute = pathname.startsWith('/dashboard')
     const isAuthRoute = pathname.startsWith('/auth')
+    const isApiRoute = pathname.startsWith('/api')
 
-    // Protect dashboard routes - redirect to auth page
-    if (isProtectedRoute && !user && !error) {
-      const redirectUrl = new URL('/auth', request.url)
-      redirectUrl.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(redirectUrl)
+    // Protect dashboard routes - redirect to auth if not authenticated
+    if (isDashboardRoute && !user) {
+      const url = new URL('/auth', request.url)
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
     }
 
-    // Redirect logged-in users away from auth pages to dashboard
-    if (isAuthRoute && user && pathname !== '/auth/callback') {
-      const redirectUrl = new URL('/dashboard', request.url)
-      return NextResponse.redirect(redirectUrl)
+    // Redirect authenticated users from auth pages to dashboard
+    // But only if not in the middle of OAuth flow
+    if (isAuthRoute && user && !isApiRoute) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   } catch (error) {
     console.error('Proxy error:', error)

@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     if (errorDescription) {
       errorUrl.searchParams.set('error_description', errorDescription)
     }
-    return NextResponse.redirect(errorUrl)
+    return NextResponse.redirect(errorUrl.toString())
   }
 
   if (code) {
@@ -25,24 +25,25 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error && data.user) {
-      // Session successfully created and cookies set
+      // Session successfully created - cookies are set automatically by createServerClient
       console.log('Auth callback successful for user:', data.user.email)
       
-      // Redirect to dashboard or the requested next page
-      const redirectUrl = new URL(next, requestUrl.origin)
-      return NextResponse.redirect(redirectUrl)
+      // Always redirect to dashboard after successful auth
+      const redirectUrl = new URL('/dashboard', requestUrl.origin)
+      return NextResponse.redirect(redirectUrl.toString())
     }
     
     if (error) {
       console.error('Auth callback error:', error.message)
-      const errorUrl = new URL('/auth/error', requestUrl.origin)
-      return NextResponse.redirect(errorUrl)
+      const errorUrl = new URL('/auth', requestUrl.origin)
+      errorUrl.searchParams.set('error', 'auth_error')
+      errorUrl.searchParams.set('error_description', error.message)
+      return NextResponse.redirect(errorUrl.toString())
     }
   }
 
-  // No code provided, redirect to auth page
+  // No code provided, redirect to auth page with error
   const redirectUrl = new URL('/auth', requestUrl.origin)
   redirectUrl.searchParams.set('error', 'no_code')
-  redirectUrl.searchParams.set('error_description', 'No authorization code received')
-  return NextResponse.redirect(redirectUrl)
+  return NextResponse.redirect(redirectUrl.toString())
 }
