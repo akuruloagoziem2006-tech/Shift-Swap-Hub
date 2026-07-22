@@ -54,14 +54,10 @@ export default function PostShift() {
         .from('shifts')
         .insert({
           user_id: user.id,
-          date: formData.date,
+          title: formData.position || 'Shift',
           start_time: formData.start_time,
           end_time: formData.end_time,
-          position: formData.position,
-          department: formData.department,
-          location: formData.location || null,
-          notes: formData.notes || null,
-          status: 'open',
+          status: 'available',
         })
 
       if (error) throw error

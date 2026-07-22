@@ -326,9 +326,8 @@ export default function ManagerApprovals() {
                   <TableHeader>
                     <TableRow className="border-zinc-800 hover:bg-zinc-900">
                       <TableHead className="text-zinc-400">Name</TableHead>
-                      <TableHead className="text-zinc-400">Email</TableHead>
                       <TableHead className="text-zinc-400">Role</TableHead>
-                      <TableHead className="text-zinc-400">Department</TableHead>
+                      <TableHead className="text-zinc-400">Created</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -337,16 +336,13 @@ export default function ManagerApprovals() {
                         <TableCell className="font-medium text-white">
                           {profile.full_name || 'Unnamed User'}
                         </TableCell>
-                        <TableCell className="text-zinc-400">
-                          {profile.email}
-                        </TableCell>
                         <TableCell>
                           <Badge variant={profile.role === 'admin' ? 'default' : profile.role === 'manager' ? 'secondary' : 'outline'}>
                             {profile.role}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-zinc-400">
-                          {profile.department || 'Not set'}
+                          {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'N/A'}
                         </TableCell>
                       </TableRow>
                     ))}
