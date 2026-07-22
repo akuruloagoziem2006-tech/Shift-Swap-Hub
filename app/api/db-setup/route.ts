@@ -98,12 +98,13 @@ DROP FUNCTION IF EXISTS public.handle_new_user();
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name, avatar_url)
+  INSERT INTO public.profiles (id, email, full_name, avatar_url, department)
   VALUES (
     new.id,
     new.email,
     COALESCE(new.raw_user_meta_data->>'full_name', new.email),
-    new.raw_user_meta_data->>'avatar_url'
+    new.raw_user_meta_data->>'avatar_url',
+    new.raw_user_meta_data->>'department'
   );
   RETURN new;
 END;
@@ -112,6 +113,15 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Grant necessary permissions
+GRANT USAGE ON SCHEMA public TO anon;
+GRANT ALL ON profiles TO anon;
+GRANT ALL ON shifts TO anon;
+GRANT ALL ON shift_swap_requests TO anon;
+
+-- Refresh PostgREST schema cache (CRITICAL for schema changes to take effect)
+NOTIFY pgrst, 'reload schema';
 `;
 
 export async function POST() {
@@ -125,7 +135,8 @@ export async function POST() {
       '3. Click "SQL Editor" in the left sidebar',
       '4. Click "New Query"',
       '5. Paste the SQL above and click "Run"',
-      '6. Tables and RLS policies will be created automatically'
+      '6. Tables and RLS policies will be created automatically',
+      '7. The NOTIFY pgrst command at the end refreshes the schema cache'
     ]
   });
 }
