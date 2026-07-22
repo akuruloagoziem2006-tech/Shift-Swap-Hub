@@ -118,6 +118,7 @@ export default function PostShift() {
                 <Select 
                   value={formData.department} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, department: value }))}
+                  required
                 >
                   <SelectTrigger className="bg-zinc-900 border-zinc-700">
                     <SelectValue placeholder="Select department" />

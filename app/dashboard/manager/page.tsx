@@ -8,13 +8,15 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Calendar, Clock, MapPin, User, Check, X, AlertCircle, Inbox } from 'lucide-react'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Calendar, Clock, MapPin, User, Check, X, AlertCircle, Inbox, Users } from 'lucide-react'
 import type { ShiftSwapRequest, Profile } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
 import { useToast } from '@/components/ui/use-toast'
 
 export default function ManagerApprovals() {
   const [requests, setRequests] = useState<ShiftSwapRequest[]>([])
+  const [profiles, setProfiles] = useState<Profile[]>([])
   const [loading, setLoading] = useState(true)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [processingId, setProcessingId] = useState<string | null>(null)
@@ -52,6 +54,14 @@ export default function ManagerApprovals() {
           .order('created_at', { ascending: false })
 
         setRequests(allRequests || [])
+
+        // Get all profiles for the profiles table
+        const { data: allProfiles } = await supabase
+          .from('profiles')
+          .select('*')
+          .order('full_name', { ascending: true })
+
+        setProfiles(allProfiles || [])
       } catch (error) {
         console.error('Error loading data:', error)
       } finally {
@@ -184,6 +194,11 @@ export default function ManagerApprovals() {
               <Badge className="ml-2 bg-teal-500">{pendingCount}</Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="profiles" className="relative">
+            <Users className="w-4 h-4 mr-2" />
+            Profiles
+            <Badge className="ml-2 bg-zinc-600">{profiles.length}</Badge>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending" className="mt-4">
@@ -297,6 +312,55 @@ export default function ManagerApprovals() {
                 <p className="text-zinc-400 mb-2">No pending swap requests</p>
                 <p className="text-sm text-muted-foreground">
                   All shift swap requests have been processed.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="profiles" className="mt-4">
+          {profiles.length > 0 ? (
+            <Card className="bg-zinc-950 border-zinc-800">
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-zinc-800 hover:bg-zinc-900">
+                      <TableHead className="text-zinc-400">Name</TableHead>
+                      <TableHead className="text-zinc-400">Email</TableHead>
+                      <TableHead className="text-zinc-400">Role</TableHead>
+                      <TableHead className="text-zinc-400">Department</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {profiles.map((profile) => (
+                      <TableRow key={profile.id} className="border-zinc-800">
+                        <TableCell className="font-medium text-white">
+                          {profile.full_name || 'Unnamed User'}
+                        </TableCell>
+                        <TableCell className="text-zinc-400">
+                          {profile.email}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={profile.role === 'admin' ? 'default' : profile.role === 'manager' ? 'secondary' : 'outline'}>
+                            {profile.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-zinc-400">
+                          {profile.department || 'Not set'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-zinc-950 border-zinc-800">
+              <CardContent className="p-12 text-center">
+                <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-zinc-400 mb-2">No profiles found</p>
+                <p className="text-sm text-muted-foreground">
+                  Profiles will appear here once users sign up.
                 </p>
               </CardContent>
             </Card>
