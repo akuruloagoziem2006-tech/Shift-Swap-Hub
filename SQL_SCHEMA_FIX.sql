@@ -1,9 +1,9 @@
 -- ============================================
--- SIMPLE SCHEMA FIX FOR SHIFT-SWAP-HUB
+-- SCHEMA FIX FOR SHIFT-SWAP-HUB
 -- Run this in Supabase SQL Editor
 -- ============================================
 
--- 1. First, fix any invalid status values
+-- 1. Fix any invalid status values
 UPDATE shifts SET status = 'open' WHERE status = 'available' OR status IS NULL;
 UPDATE shifts SET status = 'scheduled' WHERE status NOT IN ('scheduled', 'open', 'filled', 'completed', 'cancelled');
 
@@ -19,7 +19,6 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS department TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 -- 4. Fix shifts columns - ensure proper types
--- Drop existing columns if they have wrong type and re-add
 ALTER TABLE shifts DROP COLUMN IF EXISTS start_time;
 ALTER TABLE shifts DROP COLUMN IF EXISTS end_time;
 ALTER TABLE shifts DROP COLUMN IF EXISTS date;
@@ -29,7 +28,6 @@ ALTER TABLE shifts DROP COLUMN IF EXISTS location;
 ALTER TABLE shifts DROP COLUMN IF EXISTS notes;
 ALTER TABLE shifts DROP COLUMN IF EXISTS updated_at;
 
--- Add columns with correct types
 ALTER TABLE shifts ADD COLUMN start_time TIME NOT NULL DEFAULT '09:00:00';
 ALTER TABLE shifts ADD COLUMN end_time TIME NOT NULL DEFAULT '17:00:00';
 ALTER TABLE shifts ADD COLUMN date DATE NOT NULL DEFAULT CURRENT_DATE;
@@ -66,11 +64,12 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- 7. RLS policies
+-- 7. RLS policies - FIXED FOR BROWSER AND CALENDAR
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shifts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shift_swap_requests ENABLE ROW LEVEL SECURITY;
 
+-- Profiles - allow all reads (needed for user display in shifts)
 DROP POLICY IF EXISTS "Allow all reads on profiles" ON profiles;
 CREATE POLICY "Allow all reads on profiles" ON profiles FOR SELECT USING (true);
 
@@ -80,11 +79,12 @@ CREATE POLICY "Allow own profile inserts" ON profiles FOR INSERT WITH CHECK (aut
 DROP POLICY IF EXISTS "Allow own profile updates" ON profiles;
 CREATE POLICY "Allow own profile updates" ON profiles FOR UPDATE USING (auth.uid() = id);
 
+-- Shifts - allow all reads (needed for browse and calendar)
 DROP POLICY IF EXISTS "Allow all reads on shifts" ON shifts;
 CREATE POLICY "Allow all reads on shifts" ON shifts FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Allow own shift inserts" ON shifts;
-CREATE POLICY "Allow own shift inserts" ON shifts FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Allow all inserts on shifts" ON shifts;
+CREATE POLICY "Allow all inserts on shifts" ON shifts FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "Allow own shift updates" ON shifts;
 CREATE POLICY "Allow own shift updates" ON shifts FOR UPDATE USING (auth.uid() = user_id);
@@ -98,10 +98,9 @@ GRANT ALL ON shift_swap_requests TO anon, service_role;
 -- 9. Refresh PostgREST cache
 NOTIFY pgrst, 'reload schema';
 
--- 10. Verify columns
+-- 10. Verify
 SELECT column_name, data_type 
 FROM information_schema.columns 
 WHERE table_name = 'shifts' 
 ORDER BY ordinal_position;
--- Deployment trigger: Fri Jul 24 13:34:54 UTC 2026
 -- Deployment trigger
