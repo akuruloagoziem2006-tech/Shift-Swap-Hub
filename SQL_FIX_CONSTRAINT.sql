@@ -21,3 +21,4 @@ SELECT 'Constraint added successfully' as result;
 
 -- 5. Verify all status values are now valid
 SELECT DISTINCT status FROM shifts;
+-- Deployment trigger
