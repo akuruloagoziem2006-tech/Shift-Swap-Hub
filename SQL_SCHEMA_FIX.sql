@@ -18,13 +18,26 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS department TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
--- 4. Add missing columns to shifts
-ALTER TABLE shifts ADD COLUMN IF NOT EXISTS date DATE;
-ALTER TABLE shifts ADD COLUMN IF NOT EXISTS position TEXT;
-ALTER TABLE shifts ADD COLUMN IF NOT EXISTS department TEXT;
-ALTER TABLE shifts ADD COLUMN IF NOT EXISTS location TEXT;
-ALTER TABLE shifts ADD COLUMN IF NOT EXISTS notes TEXT;
-ALTER TABLE shifts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+-- 4. Fix shifts columns - ensure proper types
+-- Drop existing columns if they have wrong type and re-add
+ALTER TABLE shifts DROP COLUMN IF EXISTS start_time;
+ALTER TABLE shifts DROP COLUMN IF EXISTS end_time;
+ALTER TABLE shifts DROP COLUMN IF EXISTS date;
+ALTER TABLE shifts DROP COLUMN IF EXISTS position;
+ALTER TABLE shifts DROP COLUMN IF EXISTS department;
+ALTER TABLE shifts DROP COLUMN IF EXISTS location;
+ALTER TABLE shifts DROP COLUMN IF EXISTS notes;
+ALTER TABLE shifts DROP COLUMN IF EXISTS updated_at;
+
+-- Add columns with correct types
+ALTER TABLE shifts ADD COLUMN start_time TIME NOT NULL DEFAULT '09:00:00';
+ALTER TABLE shifts ADD COLUMN end_time TIME NOT NULL DEFAULT '17:00:00';
+ALTER TABLE shifts ADD COLUMN date DATE NOT NULL DEFAULT CURRENT_DATE;
+ALTER TABLE shifts ADD COLUMN position TEXT NOT NULL DEFAULT 'Employee';
+ALTER TABLE shifts ADD COLUMN department TEXT NOT NULL DEFAULT 'General';
+ALTER TABLE shifts ADD COLUMN location TEXT;
+ALTER TABLE shifts ADD COLUMN notes TEXT;
+ALTER TABLE shifts ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
 
 -- 5. Ensure default values
 ALTER TABLE profiles ALTER COLUMN role SET DEFAULT 'employee';
@@ -85,10 +98,9 @@ GRANT ALL ON shift_swap_requests TO anon, service_role;
 -- 9. Refresh PostgREST cache
 NOTIFY pgrst, 'reload schema';
 
--- 10. Verify
-SELECT 'profiles columns:' as info, string_agg(column_name, ', ') as cols
-FROM information_schema.columns WHERE table_name = 'profiles' AND column_name NOT LIKE '%.%';
-
-SELECT 'shifts columns:' as info, string_agg(column_name, ', ') as cols
-FROM information_schema.columns WHERE table_name = 'shifts' AND column_name NOT LIKE '%m%';
+-- 10. Verify columns
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'shifts' 
+ORDER BY ordinal_position;
 -- Deployment trigger: Fri Jul 24 13:34:54 UTC 2026

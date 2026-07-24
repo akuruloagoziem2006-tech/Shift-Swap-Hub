@@ -12,6 +12,15 @@ import { Loader2 } from 'lucide-react'
 
 const DEPARTMENTS = ['Emergency', 'ICU', 'Pediatrics', 'Surgery', 'Retail', 'Warehouse', 'Security', 'Food Service']
 
+// Format time from HH:MM to HH:MM:SS for PostgreSQL TIME type
+function formatTime(time: string | null): string | null {
+  if (!time) return null
+  // If already in HH:MM:SS format, return as is
+  if (time.match(/^\d{2}:\d{2}:\d{2}$/)) return time
+  // Convert HH:MM to HH:MM:SS
+  return `${time}:00`
+}
+
 export default function PostShift() {
   const router = useRouter()
   const supabase = createClient()
@@ -34,12 +43,15 @@ export default function PostShift() {
       return
     }
 
-    // Insert shift
+    const startTime = formData.get('start_time') as string
+    const endTime = formData.get('end_time') as string
+
+    // Insert shift with properly formatted time
     const { error: insertError } = await supabase.from('shifts').insert({
       user_id: user.id,
       date: formData.get('date'),
-      start_time: formData.get('start_time'),
-      end_time: formData.get('end_time'),
+      start_time: formatTime(startTime),
+      end_time: formatTime(endTime),
       position: formData.get('position'),
       department: formData.get('department'),
       location: formData.get('location') || null,
