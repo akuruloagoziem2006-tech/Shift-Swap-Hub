@@ -91,3 +91,4 @@ FROM information_schema.columns WHERE table_name = 'profiles' AND column_name NO
 
 SELECT 'shifts columns:' as info, string_agg(column_name, ', ') as cols
 FROM information_schema.columns WHERE table_name = 'shifts' AND column_name NOT LIKE '%m%';
+-- Deployment trigger: Fri Jul 24 13:34:54 UTC 2026
