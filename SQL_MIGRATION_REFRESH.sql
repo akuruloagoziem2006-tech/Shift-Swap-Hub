@@ -3,6 +3,12 @@
 -- Run this in Supabase SQL Editor
 -- ============================================
 
+-- 0. FIX ANY INVALID STATUS VALUES FIRST (before adding constraint)
+-- This prevents constraint violation errors from existing rows
+UPDATE shifts SET status = 'open' WHERE status = 'available';
+UPDATE shifts SET status = 'scheduled' WHERE status IS NULL;
+UPDATE shifts SET status = 'scheduled' WHERE status NOT IN ('scheduled', 'open', 'filled', 'completed', 'cancelled');
+
 -- 1. Add missing columns to profiles
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
