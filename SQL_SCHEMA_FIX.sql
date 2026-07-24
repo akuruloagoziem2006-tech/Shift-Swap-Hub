@@ -104,3 +104,4 @@ FROM information_schema.columns
 WHERE table_name = 'shifts' 
 ORDER BY ordinal_position;
 -- Deployment trigger: Fri Jul 24 13:34:54 UTC 2026
+-- Deployment trigger
