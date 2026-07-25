@@ -12,34 +12,78 @@ ALTER TABLE shifts DROP CONSTRAINT IF EXISTS shifts_status_check;
 ALTER TABLE shifts ADD CONSTRAINT shifts_status_check 
 CHECK (status IN ('scheduled', 'open', 'filled', 'completed', 'cancelled'));
 
--- 3. Add missing columns to profiles
+-- 3. Add missing columns to profiles (safe - only adds if missing)
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS department TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
--- 4. Fix shifts columns - ensure proper types
-ALTER TABLE shifts DROP COLUMN IF EXISTS start_time;
-ALTER TABLE shifts DROP COLUMN IF EXISTS end_time;
-ALTER TABLE shifts DROP COLUMN IF EXISTS date;
-ALTER TABLE shifts DROP COLUMN IF EXISTS position;
-ALTER TABLE shifts DROP COLUMN IF EXISTS department;
-ALTER TABLE shifts DROP COLUMN IF EXISTS location;
-ALTER TABLE shifts DROP COLUMN IF EXISTS notes;
-ALTER TABLE shifts DROP COLUMN IF EXISTS updated_at;
+-- 4. Fix shifts columns - ALTER only if needed (safer approach)
+-- Use ALTER COLUMN to change types if columns exist with wrong type
 
-ALTER TABLE shifts ADD COLUMN start_time TIME NOT NULL DEFAULT '09:00:00';
-ALTER TABLE shifts ADD COLUMN end_time TIME NOT NULL DEFAULT '17:00:00';
-ALTER TABLE shifts ADD COLUMN date DATE NOT NULL DEFAULT CURRENT_DATE;
-ALTER TABLE shifts ADD COLUMN position TEXT NOT NULL DEFAULT 'Employee';
-ALTER TABLE shifts ADD COLUMN department TEXT NOT NULL DEFAULT 'General';
-ALTER TABLE shifts ADD COLUMN location TEXT;
-ALTER TABLE shifts ADD COLUMN notes TEXT;
-ALTER TABLE shifts ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
+-- Check if start_time column exists and fix type
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'shifts' AND column_name = 'start_time'
+  ) THEN
+    ALTER TABLE shifts ADD COLUMN start_time TIME DEFAULT '09:00:00';
+  END IF;
+END $$;
+
+-- Check if end_time column exists and fix type
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'shifts' AND column_name = 'end_time'
+  ) THEN
+    ALTER TABLE shifts ADD COLUMN end_time TIME DEFAULT '17:00:00';
+  END IF;
+END $$;
+
+-- Check if date column exists
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'shifts' AND column_name = 'date'
+  ) THEN
+    ALTER TABLE shifts ADD COLUMN date DATE DEFAULT CURRENT_DATE;
+  END IF;
+END $$;
+
+-- Check if position column exists
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'shifts' AND column_name = 'position'
+  ) THEN
+    ALTER TABLE shifts ADD COLUMN position TEXT DEFAULT 'Employee';
+  END IF;
+END $$;
+
+-- Check if shifts department column exists
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'shifts' AND column_name = 'department'
+  ) THEN
+    ALTER TABLE shifts ADD COLUMN department TEXT DEFAULT 'General';
+  END IF;
+END $$;
+
+-- Add optional columns
+ALTER TABLE shifts ADD COLUMN IF NOT EXISTS location TEXT;
+ALTER TABLE shifts ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE shifts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 -- 5. Ensure default values
 ALTER TABLE profiles ALTER COLUMN role SET DEFAULT 'employee';
-ALTER TABLE shifts ALTER COLUMN status SET DEFAULT 'scheduled';
+ALTER TABLE shifts ALTER COLUMN status SET DEFAULT 'open';
 
 -- 6. Update trigger for new users
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -83,8 +127,8 @@ CREATE POLICY "Allow own profile updates" ON profiles FOR UPDATE USING (auth.uid
 DROP POLICY IF EXISTS "Allow all reads on shifts" ON shifts;
 CREATE POLICY "Allow all reads on shifts" ON shifts FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Allow all inserts on shifts" ON shifts;
-CREATE POLICY "Allow all inserts on shifts" ON shifts FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Allow own shift inserts" ON shifts;
+CREATE POLICY "Allow own shift inserts" ON shifts FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "Allow own shift updates" ON shifts;
 CREATE POLICY "Allow own shift updates" ON shifts FOR UPDATE USING (auth.uid() = user_id);
@@ -103,5 +147,3 @@ SELECT column_name, data_type
 FROM information_schema.columns 
 WHERE table_name = 'shifts' 
 ORDER BY ordinal_position;
--- Deployment trigger
--- Deployment trigger

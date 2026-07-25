@@ -6,12 +6,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Calendar, MapPin, Clock, Search, Filter, User } from 'lucide-react'
-import type { Shift, Profile } from '@/lib/types'
-import { formatDate, formatTime } from '@/lib/utils'
+import { Calendar, MapPin, Clock, Search, User, RefreshCw } from 'lucide-react'
+import type { Shift } from '@/lib/types'
 import { useToast } from '@/components/ui/use-toast'
+
+// Format time for display (handles HH:MM:SS and HH:MM)
+function formatTimeDisplay(time: string | null): string {
+  if (!time) return 'N/A'
+  const parts = time.split(':')
+  const hours = parseInt(parts[0], 10)
+  const minutes = parts[1] || '00'
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  const hour12 = hours % 12 || 12
+  return `${hour12}:${minutes} ${ampm}`
+}
+
+// Format date for display
+function formatDateDisplay(date: string): string {
+  if (!date) return 'N/A'
+  const d = new Date(date)
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+}
 
 export default function BrowseShifts() {
   const [shifts, setShifts] = useState<Shift[]>([])
@@ -23,31 +39,41 @@ export default function BrowseShifts() {
   const supabase = createClient()
   const { toast } = useToast()
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          setUserId(user.id)
-        }
-
-        const { data, error } = await supabase
-          .from('shifts')
-          .select('*, user:profiles(*)')
-          .eq('status', 'open')
-          .order('date', { ascending: true })
-
-        if (!error && data) {
-          setShifts(data)
-        }
-      } catch (error) {
-        console.error('Error loading shifts:', error)
-      } finally {
-        setLoading(false)
+  async function loadShifts() {
+    setLoading(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUserId(user.id)
       }
-    }
 
-    loadData()
+      // Query all shifts with open status
+      const { data, error } = await supabase
+        .from('shifts')
+        .select('*, user:profiles(*)')
+        .eq('status', 'open')
+        .order('date', { ascending: true })
+
+      if (error) {
+        console.error('Error loading shifts:', error)
+        toast({
+          title: 'Error loading shifts',
+          description: error.message,
+          variant: 'destructive',
+        })
+      } else {
+        console.log('Loaded shifts:', data?.length || 0)
+        setShifts(data || [])
+      }
+    } catch (error) {
+      console.error('Error loading shifts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadShifts()
   }, [])
 
   const handleRequestSwap = async (shift: Shift) => {
@@ -181,11 +207,11 @@ export default function BrowseShifts() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-teal-500" />
-                    <span>{formatDate(shift.date, 'EEEE, MMM d')}</span>
+                    <span>{formatDateDisplay(shift.date)}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Clock className="w-5 h-5 text-teal-500" />
-                    <span>{formatTime(shift.start_time)} - {formatTime(shift.end_time)}</span>
+                    <span>{formatTimeDisplay(shift.start_time)} - {formatTimeDisplay(shift.end_time)}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <MapPin className="w-5 h-5 text-teal-500" />
@@ -220,9 +246,11 @@ export default function BrowseShifts() {
       ) : (
         <Card className="bg-zinc-950 border-zinc-800">
           <CardContent className="p-12 text-center">
-            <p className="text-zinc-400 mb-2">No shifts found matching your criteria.</p>
-            <Button variant="outline" onClick={() => { setSearchTerm(''); setDepartmentFilter('all'); }}>
-              Clear Filters
+            <p className="text-zinc-400 mb-2">No open shifts available.</p>
+            <p className="text-zinc-500 text-sm mb-4">Post a shift to make it available for swap.</p>
+            <Button variant="outline" onClick={() => loadShifts()}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
             </Button>
           </CardContent>
         </Card>
