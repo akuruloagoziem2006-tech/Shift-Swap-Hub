@@ -47,10 +47,10 @@ export default function BrowseShifts() {
         setUserId(user.id)
       }
 
-      // Query all shifts with open status
+      // Query all shifts with open status - without join first
       const { data, error } = await supabase
         .from('shifts')
-        .select('*, user:profiles(*)')
+        .select('*')
         .eq('status', 'open')
         .order('date', { ascending: true })
 
@@ -61,12 +61,31 @@ export default function BrowseShifts() {
           description: error.message,
           variant: 'destructive',
         })
+        setShifts([])
       } else {
         console.log('Loaded shifts:', data?.length || 0)
-        setShifts(data || [])
+        
+        // Now fetch profiles separately for each shift owner
+        if (data && data.length > 0) {
+          const uniqueUserIds = [...new Set(data.map(s => s.user_id))]
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('*')
+            .in('id', uniqueUserIds)
+          
+          const profileMap = new Map(profiles?.map(p => [p.id, p]) || [])
+          const shiftsWithUsers = data.map(shift => ({
+            ...shift,
+            user: profileMap.get(shift.user_id)
+          }))
+          setShifts(shiftsWithUsers)
+        } else {
+          setShifts([])
+        }
       }
     } catch (error) {
       console.error('Error loading shifts:', error)
+      setShifts([])
     } finally {
       setLoading(false)
     }

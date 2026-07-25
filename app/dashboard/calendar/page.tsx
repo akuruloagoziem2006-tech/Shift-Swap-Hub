@@ -57,20 +57,30 @@ export default function CalendarPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      // Get all shifts
+      // Get all shifts without join
       const { data: allShifts } = await supabase
         .from('shifts')
-        .select(`
-          *,
-          user:profiles(*)
-        `)
+        .select('*')
         .order('date', { ascending: true })
         .order('start_time', { ascending: true })
 
       if (allShifts) {
-        setShifts(allShifts)
+        // Fetch profiles separately
+        const uniqueUserIds = [...new Set(allShifts.map(s => s.user_id))]
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('*')
+          .in('id', uniqueUserIds)
+        
+        const profileMap = new Map(profiles?.map(p => [p.id, p]) || [])
+        const shiftsWithUsers = allShifts.map(shift => ({
+          ...shift,
+          user: profileMap.get(shift.user_id)
+        }))
+        
+        setShifts(shiftsWithUsers)
         // Track user's own shifts
-        const myIds = new Set(allShifts.filter(s => s.user_id === user.id).map(s => s.id))
+        const myIds = new Set(shiftsWithUsers.filter(s => s.user_id === user.id).map(s => s.id))
         setMyShiftIds(myIds)
       }
     } catch (error) {

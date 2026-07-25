@@ -19,8 +19,6 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS department TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 -- 4. Fix shifts columns - ALTER only if needed (safer approach)
--- Use ALTER COLUMN to change types if columns exist with wrong type
-
 -- Check if start_time column exists and fix type
 DO $$
 BEGIN
@@ -81,11 +79,16 @@ ALTER TABLE shifts ADD COLUMN IF NOT EXISTS location TEXT;
 ALTER TABLE shifts ADD COLUMN IF NOT EXISTS notes TEXT;
 ALTER TABLE shifts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
--- 5. Ensure default values
+-- 5. Add FOREIGN KEY between shifts.user_id and profiles.id
+ALTER TABLE shifts DROP CONSTRAINT IF EXISTS shifts_user_id_fkey;
+ALTER TABLE shifts ADD CONSTRAINT shifts_user_id_fkey 
+FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE;
+
+-- 6. Ensure default values
 ALTER TABLE profiles ALTER COLUMN role SET DEFAULT 'employee';
 ALTER TABLE shifts ALTER COLUMN status SET DEFAULT 'open';
 
--- 6. Update trigger for new users
+-- 7. Update trigger for new users
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
 
@@ -108,12 +111,12 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- 7. RLS policies - FIXED FOR BROWSER AND CALENDAR
+-- 8. RLS policies
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shifts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shift_swap_requests ENABLE ROW LEVEL SECURITY;
 
--- Profiles - allow all reads (needed for user display in shifts)
+-- Profiles - allow all reads
 DROP POLICY IF EXISTS "Allow all reads on profiles" ON profiles;
 CREATE POLICY "Allow all reads on profiles" ON profiles FOR SELECT USING (true);
 
@@ -123,7 +126,7 @@ CREATE POLICY "Allow own profile inserts" ON profiles FOR INSERT WITH CHECK (aut
 DROP POLICY IF EXISTS "Allow own profile updates" ON profiles;
 CREATE POLICY "Allow own profile updates" ON profiles FOR UPDATE USING (auth.uid() = id);
 
--- Shifts - allow all reads (needed for browse and calendar)
+-- Shifts - allow all reads
 DROP POLICY IF EXISTS "Allow all reads on shifts" ON shifts;
 CREATE POLICY "Allow all reads on shifts" ON shifts FOR SELECT USING (true);
 
@@ -133,18 +136,22 @@ CREATE POLICY "Allow own shift inserts" ON shifts FOR INSERT WITH CHECK (auth.ui
 DROP POLICY IF EXISTS "Allow own shift updates" ON shifts;
 CREATE POLICY "Allow own shift updates" ON shifts FOR UPDATE USING (auth.uid() = user_id);
 
--- 8. Grant permissions
+-- 9. Grant permissions
 GRANT USAGE ON SCHEMA public TO anon, service_role;
 GRANT ALL ON profiles TO anon, service_role;
 GRANT ALL ON shifts TO anon, service_role;
 GRANT ALL ON shift_swap_requests TO anon, service_role;
 
--- 9. Refresh PostgREST cache
+-- 10. Refresh PostgREST cache - IMPORTANT for relationship discovery
 NOTIFY pgrst, 'reload schema';
 
--- 10. Verify
-SELECT column_name, data_type 
+-- 11. Verify columns and constraints
+SELECT column_name, data_type, is_nullable 
 FROM information_schema.columns 
 WHERE table_name = 'shifts' 
 ORDER BY ordinal_position;
+
+SELECT conname, conrelid::regclass AS table_name, confrelid::regclass AS foreign_table
+FROM pg_constraint 
+WHERE contype = 'f' AND conrelid = 'shifts'::regclass;
 -- Trigger deployment
