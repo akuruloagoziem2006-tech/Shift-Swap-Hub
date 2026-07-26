@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Separator } from '@/components/ui/separator'
 import { 
   Calendar as CalendarIcon, 
   Clock, 
@@ -20,19 +20,18 @@ import {
   ArrowRightLeft,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Briefcase,
+  CalendarCheck,
+  CalendarX,
+  CheckCircle2,
+  Users
 } from 'lucide-react'
-import type { Shift, ShiftSwapRequest } from '@/lib/types'
+import type { Shift } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
 import { useToast } from '@/components/ui/use-toast'
 import { cn } from '@/lib/utils'
 
 type ViewMode = 'my-shifts' | 'all-shifts' | 'available'
-
-interface DayShifts {
-  date: string
-  shifts: Shift[]
-}
 
 export default function CalendarPage() {
   const [loading, setLoading] = useState(true)
@@ -57,7 +56,6 @@ export default function CalendarPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      // Get all shifts without join
       const { data: allShifts } = await supabase
         .from('shifts')
         .select('*')
@@ -65,7 +63,6 @@ export default function CalendarPage() {
         .order('start_time', { ascending: true })
 
       if (allShifts) {
-        // Fetch profiles separately
         const uniqueUserIds = [...new Set(allShifts.map(s => s.user_id))]
         const { data: profiles } = await supabase
           .from('profiles')
@@ -79,7 +76,6 @@ export default function CalendarPage() {
         }))
         
         setShifts(shiftsWithUsers)
-        // Track user's own shifts
         const myIds = new Set(shiftsWithUsers.filter(s => s.user_id === user.id).map(s => s.id))
         setMyShiftIds(myIds)
       }
@@ -101,7 +97,6 @@ export default function CalendarPage() {
     }
   }, [shifts, viewMode, myShiftIds])
 
-  // Group shifts by date
   const shiftsByDate = useMemo(() => {
     const grouped: Record<string, Shift[]> = {}
     filteredShifts.forEach(shift => {
@@ -112,40 +107,66 @@ export default function CalendarPage() {
     return grouped
   }, [filteredShifts])
 
-  // Get shifts for selected date
   const selectedDateShifts = useMemo(() => {
     if (!selectedDate) return []
     const dateKey = formatDate(selectedDate.toISOString(), 'yyyy-MM-dd')
     return shiftsByDate[dateKey] || []
   }, [selectedDate, shiftsByDate])
 
-  // Check if a date has shifts
   const hasShifts = (date: Date) => {
     const dateKey = formatDate(date.toISOString(), 'yyyy-MM-dd')
     return (shiftsByDate[dateKey]?.length || 0) > 0
   }
 
-  // Check if a date has open shifts
   const hasOpenShifts = (date: Date) => {
     const dateKey = formatDate(date.toISOString(), 'yyyy-MM-dd')
     const dateShifts = shiftsByDate[dateKey] || []
     return dateShifts.some(s => s.status === 'open' || s.status === 'scheduled')
   }
 
-  // Get badge color based on status
-  const getStatusColor = (status: string, isOwn: boolean) => {
-    if (isOwn) return 'bg-blue-500/20 text-blue-400 border-blue-500'
+  const getStatusConfig = (status: string, isOwn: boolean) => {
+    if (isOwn) return { 
+      bg: 'bg-gradient-to-br from-blue-600/20 to-blue-800/20', 
+      border: 'border-blue-500/40',
+      text: 'text-blue-400',
+      icon: <CalendarCheck className="w-3 h-3" />
+    }
     switch (status) {
       case 'open':
-        return 'bg-teal-500/20 text-teal-400 border-teal-500'
+        return { 
+          bg: 'bg-gradient-to-br from-emerald-500/20 to-emerald-700/20', 
+          border: 'border-emerald-500/40',
+          text: 'text-emerald-400',
+          icon: <ArrowRightLeft className="w-3 h-3" />
+        }
       case 'scheduled':
-        return 'bg-amber-500/20 text-amber-400 border-amber-500'
+        return { 
+          bg: 'bg-gradient-to-br from-amber-500/20 to-amber-700/20', 
+          border: 'border-amber-500/40',
+          text: 'text-amber-400',
+          icon: <Clock className="w-3 h-3" />
+        }
       case 'filled':
-        return 'bg-green-500/20 text-green-400 border-green-500'
+        return { 
+          bg: 'bg-gradient-to-br from-green-500/20 to-green-700/20', 
+          border: 'border-green-500/40',
+          text: 'text-green-400',
+          icon: <CheckCircle2 className="w-3 h-3" />
+        }
       case 'completed':
-        return 'bg-gray-500/20 text-gray-400 border-gray-500'
+        return { 
+          bg: 'bg-gradient-to-br from-zinc-500/20 to-zinc-600/20', 
+          border: 'border-zinc-500/40',
+          text: 'text-zinc-400',
+          icon: <CalendarCheck className="w-3 h-3" />
+        }
       default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500'
+        return { 
+          bg: 'bg-gradient-to-br from-zinc-500/20 to-zinc-600/20', 
+          border: 'border-zinc-500/40',
+          text: 'text-zinc-400',
+          icon: <CalendarX className="w-3 h-3" />
+        }
     }
   }
 
@@ -201,63 +222,124 @@ export default function CalendarPage() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto">
-        <Skeleton className="h-10 w-64 mb-8" />
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-9 w-48" />
+          <Skeleton className="h-5 w-72" />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-[420px] w-full rounded-xl" />
           </div>
-          <Skeleton className="h-96 w-full" />
+          <Skeleton className="h-[420px] w-full rounded-xl" />
         </div>
       </div>
     )
   }
 
+  const totalShifts = filteredShifts.length
+  const openShifts = filteredShifts.filter(s => s.status === 'open' || s.status === 'scheduled').length
+  const myShiftsCount = filteredShifts.filter(s => myShiftIds.has(s.id)).length
+
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Shift Calendar</h1>
-        <p className="text-zinc-400">
-          View and manage shifts. Click on a date to see shifts and request swaps.
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Header Section */}
+      <div className="space-y-1">
+        <h1 className="text-3xl font-bold tracking-tight">Shift Calendar</h1>
+        <p className="text-muted-foreground">
+          View and manage your work schedule. Click on a date to see shift details.
         </p>
       </div>
 
+      {/* Stats Overview */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-br from-card to-card/80 border-border/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Briefcase className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{totalShifts}</p>
+                <p className="text-xs text-muted-foreground">Total Shifts</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 border-emerald-500/20">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-emerald-500/10">
+                <ArrowRightLeft className="w-5 h-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{openShifts}</p>
+                <p className="text-xs text-muted-foreground">Available for Swap</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-blue-500/5 to-blue-500/10 border-blue-500/20">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-500/10">
+                <Users className="w-5 h-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{myShiftsCount}</p>
+                <p className="text-xs text-muted-foreground">Your Shifts</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendar */}
-        <div className="lg:col-span-2">
-          <Card className="bg-zinc-950 border-zinc-800">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Calendar</CardTitle>
-                  <CardDescription>Navigate months and click dates to view shifts</CardDescription>
+        {/* Calendar Section */}
+        <div className="lg:col-span-2 space-y-4">
+          <Card className="bg-card border-border/50 shadow-sm">
+            <CardHeader className="pb-4 border-b border-border/50">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <CalendarIcon className="w-5 h-5 text-primary" />
+                    {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </CardTitle>
+                  <CardDescription>Select a date to view shift details</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={goToToday}>
+                  <Button variant="outline" size="sm" onClick={goToToday} className="gap-2">
+                    <CalendarCheck className="w-4 h-4" />
                     Today
                   </Button>
-                  <Button variant="outline" size="icon" onClick={goToPreviousMonth}>
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={goToNextMonth}>
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
+                  <div className="flex">
+                    <Button variant="outline" size="icon" className="rounded-r-none" onClick={goToPreviousMonth}>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" className="rounded-l-none border-l-0" onClick={goToNextMonth}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-semibold">
-                  {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                </h3>
-                <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)} className="w-auto">
-                  <TabsList className="h-8">
-                    <TabsTrigger value="my-shifts" className="text-xs px-2 py-1">My Shifts</TabsTrigger>
-                    <TabsTrigger value="all-shifts" className="text-xs px-2 py-1">All</TabsTrigger>
-                    <TabsTrigger value="available" className="text-xs px-2 py-1">Available</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+            <CardContent className="p-6">
+              <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)} className="mb-6">
+                <TabsList className="grid w-full grid-cols-3 h-10">
+                  <TabsTrigger value="my-shifts" className="gap-2 text-xs sm:text-sm">
+                    <Users className="w-4 h-4" />
+                    <span className="hidden sm:inline">My Shifts</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="all-shifts" className="gap-2 text-xs sm:text-sm">
+                    <Briefcase className="w-4 h-4" />
+                    <span className="hidden sm:inline">All Shifts</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="available" className="gap-2 text-xs sm:text-sm">
+                    <ArrowRightLeft className="w-4 h-4" />
+                    <span className="hidden sm:inline">Available</span>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
               
               <Calendar
                 mode="single"
@@ -271,8 +353,8 @@ export default function CalendarPage() {
                   hasOpenShifts: (date) => hasOpenShifts(date),
                 }}
                 modifiersClassNames={{
-                  hasShifts: 'bg-teal-500/10',
-                  hasOpenShifts: 'bg-teal-500/20 border border-teal-500/50',
+                  hasShifts: 'bg-emerald-500/10 hover:bg-emerald-500/20',
+                  hasOpenShifts: 'bg-emerald-500/20 border-2 border-emerald-500/50 font-semibold',
                 }}
                 components={{
                   DayButton: ({ day, modifiers, ...props }) => {
@@ -285,18 +367,23 @@ export default function CalendarPage() {
                       <div className="relative w-full h-full">
                         <button
                           className={cn(
-                            'w-full h-full p-0 text-sm flex flex-col items-center justify-center rounded-md transition-colors',
-                            modifiers.today && 'bg-accent',
-                            modifiers.selected && 'bg-primary text-primary-foreground',
-                            !modifiers.selected && !modifiers.disabled && 'hover:bg-accent'
+                            'w-full h-full p-0 text-sm flex flex-col items-center justify-center rounded-lg transition-all duration-200',
+                            modifiers.today && 'bg-primary/10 text-primary font-semibold',
+                            modifiers.selected && 'bg-primary text-primary-foreground font-semibold shadow-md',
+                            !modifiers.selected && !modifiers.disabled && 'hover:bg-accent/50'
                           )}
                           {...props}
                         >
-                          <span>{day.number}</span>
+                          <span>{day.date.getDate()}</span>
                           {shiftCount > 0 && (
-                            <div className="flex gap-0.5 mt-0.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
-                              {openCount > 0 && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
+                            <div className="flex gap-0.5 mt-1">
+                              <span className={cn(
+                                "w-1.5 h-1.5 rounded-full",
+                                openCount > 0 ? "bg-emerald-500" : "bg-amber-500"
+                              )} />
+                              {openCount > 0 && openCount < shiftCount && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500/70" />
+                              )}
                             </div>
                           )}
                         </button>
@@ -306,73 +393,94 @@ export default function CalendarPage() {
                 }}
               />
 
-              <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-teal-500" />
-                  Has shifts
+              <Separator className="my-6" />
+
+              <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span>Has shifts</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  Has open shifts
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-emerald-500/50" />
+                  <span>Open for swap</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-amber-500" />
+                  <span>Scheduled only</span>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Selected Date Shifts */}
-        <div>
-          <Card className="bg-zinc-950 border-zinc-800">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">
+        {/* Selected Date Shifts Panel */}
+        <div className="space-y-4">
+          <Card className="bg-card border-border/50 shadow-sm">
+            <CardHeader className="pb-3 border-b border-border/50">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <CalendarIcon className="w-5 h-5 text-primary" />
                 {selectedDate 
                   ? formatDate(selectedDate.toISOString(), 'EEEE, MMMM d')
                   : 'Select a date'}
               </CardTitle>
-              <CardDescription>
-                {selectedDateShifts.length > 0 
-                  ? `${selectedDateShifts.length} shift${selectedDateShifts.length > 1 ? 's' : ''}`
-                  : 'No shifts on this date'}
+              <CardDescription className="flex items-center gap-2">
+                {selectedDateShifts.length > 0 ? (
+                  <>
+                    <span className="inline-flex items-center gap-1">
+                      <Briefcase className="w-3 h-3" />
+                      {selectedDateShifts.length} shift{selectedDateShifts.length > 1 ? 's' : ''}
+                    </span>
+                    <span className="text-primary/60">•</span>
+                    <span className="inline-flex items-center gap-1">
+                      <ArrowRightLeft className="w-3 h-3" />
+                      {selectedDateShifts.filter(s => s.status === 'open' || s.status === 'scheduled').length} available
+                    </span>
+                  </>
+                ) : (
+                  'No shifts on this date'
+                )}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 pt-4">
               {selectedDateShifts.length > 0 ? (
                 selectedDateShifts.map((shift) => {
                   const isOwn = myShiftIds.has(shift.id)
+                  const statusConfig = getStatusConfig(shift.status, isOwn)
                   return (
                     <div
                       key={shift.id}
                       className={cn(
-                        'p-3 rounded-lg border transition-colors cursor-pointer',
-                        isOwn 
-                          ? 'bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20'
-                          : 'bg-secondary/30 border-border hover:bg-secondary/50'
+                        'p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md',
+                        statusConfig.bg,
+                        statusConfig.border,
+                        isOwn ? 'ring-2 ring-blue-500/30' : ''
                       )}
                       onClick={() => setSelectedShift(shift)}
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <p className="font-medium">{shift.position}</p>
-                          <p className="text-sm text-muted-foreground">{shift.department}</p>
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="space-y-0.5">
+                          <p className="font-semibold text-sm">{shift.position}</p>
+                          <p className="text-xs text-muted-foreground">{shift.department}</p>
                         </div>
-                        <Badge className={cn('text-xs', getStatusColor(shift.status, isOwn))}>
-                          {isOwn ? 'My Shift' : shift.status}
+                        <Badge variant="outline" className={cn('gap-1 text-xs', statusConfig.bg, statusConfig.border, statusConfig.text)}>
+                          {statusConfig.icon}
+                          {isOwn ? 'Mine' : shift.status}
                         </Badge>
                       </div>
                       
-                      <div className="space-y-1 text-sm">
+                      <div className="space-y-2 text-sm">
                         <div className="flex items-center gap-2 text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span>{formatTime(shift.start_time)} - {formatTime(shift.end_time)}</span>
+                          <Clock className="w-4 h-4 text-foreground/50" />
+                          <span className="font-medium">{formatTime(shift.start_time)} - {formatTime(shift.end_time)}</span>
                         </div>
                         {shift.location && (
                           <div className="flex items-center gap-2 text-muted-foreground">
-                            <MapPin className="w-3 h-3" />
+                            <MapPin className="w-4 h-4 text-foreground/50" />
                             <span>{shift.location}</span>
                           </div>
                         )}
                         <div className="flex items-center gap-2 text-muted-foreground">
-                          <User className="w-3 h-3" />
+                          <User className="w-4 h-4 text-foreground/50" />
                           <span>{shift.user?.full_name || 'Unknown'}</span>
                         </div>
                       </div>
@@ -380,13 +488,13 @@ export default function CalendarPage() {
                       {!isOwn && (shift.status === 'open' || shift.status === 'scheduled') && (
                         <Button 
                           size="sm" 
-                          className="w-full mt-3 bg-teal-600 hover:bg-teal-700"
+                          className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 gap-2"
                           onClick={(e) => {
                             e.stopPropagation()
                             setSelectedShift(shift)
                           }}
                         >
-                          <ArrowRightLeft className="w-3 h-3 mr-1" />
+                          <ArrowRightLeft className="w-4 h-4" />
                           Request Swap
                         </Button>
                       )}
@@ -394,36 +502,14 @@ export default function CalendarPage() {
                   )
                 })
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <CalendarIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No shifts scheduled</p>
+                <div className="text-center py-12 space-y-3">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-muted/50 flex items-center justify-center">
+                    <CalendarX className="w-8 h-8 text-muted-foreground/50" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">No shifts scheduled</p>
+                  <p className="text-xs text-muted-foreground">Select another date to view shifts</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Legend Card */}
-          <Card className="bg-zinc-950 border-zinc-800 mt-4">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Legend</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-teal-500" />
-                <span>Open shift (available for swap)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-500" />
-                <span>Scheduled shift</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-blue-500" />
-                <span>Your shift</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-green-500" />
-                <span>Filled (swap completed)</span>
-              </div>
             </CardContent>
           </Card>
         </div>
@@ -431,9 +517,12 @@ export default function CalendarPage() {
 
       {/* Swap Request Dialog */}
       <Dialog open={!!selectedShift && !myShiftIds.has(selectedShift?.id || '')} onOpenChange={() => setSelectedShift(null)}>
-        <DialogContent className="bg-zinc-950 border-zinc-800">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Request Shift Swap</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <ArrowRightLeft className="w-5 h-5 text-primary" />
+              Request Shift Swap
+            </DialogTitle>
             <DialogDescription>
               Send a request to swap this shift. A manager will need to approve the swap.
             </DialogDescription>
@@ -441,27 +530,35 @@ export default function CalendarPage() {
           
           {selectedShift && (
             <div className="space-y-4">
-              <div className="p-4 bg-secondary/30 rounded-lg space-y-2">
+              <div className={cn(
+                'p-4 rounded-xl border space-y-3',
+                getStatusConfig(selectedShift.status, false).bg,
+                getStatusConfig(selectedShift.status, false).border
+              )}>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">{selectedShift.position}</span>
-                  <Badge className={getStatusColor(selectedShift.status, false)}>
+                  <span className="font-semibold">{selectedShift.position}</span>
+                  <Badge variant="outline" className={cn(
+                    getStatusConfig(selectedShift.status, false).bg,
+                    getStatusConfig(selectedShift.status, false).border,
+                    getStatusConfig(selectedShift.status, false).text
+                  )}>
                     {selectedShift.status}
                   </Badge>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <CalendarIcon className="w-4 h-4" />
                     {formatDate(selectedShift.date, 'MMM d, yyyy')}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Clock className="w-4 h-4" />
                     {formatTime(selectedShift.start_time)} - {formatTime(selectedShift.end_time)}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4" />
                     {selectedShift.location || 'N/A'}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <User className="w-4 h-4" />
                     {selectedShift.user?.full_name || 'Unknown'}
                   </div>
@@ -469,28 +566,34 @@ export default function CalendarPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message">Message (optional)</Label>
+                <Label htmlFor="message" className="text-sm font-medium">Message (optional)</Label>
                 <Textarea
                   id="message"
                   placeholder="Add a note to your swap request..."
                   value={swapMessage}
                   onChange={(e) => setSwapMessage(e.target.value)}
                   rows={3}
+                  className="resize-none"
                 />
               </div>
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setSelectedShift(null)}>
               Cancel
             </Button>
             <Button 
               onClick={handleRequestSwap}
               disabled={submitting}
-              className="bg-teal-600 hover:bg-teal-700"
+              className="bg-emerald-600 hover:bg-emerald-700 gap-2"
             >
-              {submitting ? 'Sending...' : 'Send Request'}
+              {submitting ? 'Sending...' : (
+                <>
+                  <ArrowRightLeft className="w-4 h-4" />
+                  Send Request
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
