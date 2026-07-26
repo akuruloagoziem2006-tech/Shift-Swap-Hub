@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -8,27 +9,11 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
-import { Calendar, MapPin, Clock, Search, User, RefreshCw, Filter } from 'lucide-react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Calendar, MapPin, Clock, Search, User, RefreshCw, Filter, CalendarOff, PlusCircle, Send } from 'lucide-react'
 import type { Shift } from '@/lib/types'
 import { useToast } from '@/components/ui/use-toast'
-
-// Format time for display (handles HH:MM:SS and HH:MM)
-function formatTimeDisplay(time: string | null): string {
-  if (!time) return 'N/A'
-  const parts = time.split(':')
-  const hours = parseInt(parts[0], 10)
-  const minutes = parts[1] || '00'
-  const ampm = hours >= 12 ? 'PM' : 'AM'
-  const hour12 = hours % 12 || 12
-  return `${hour12}:${minutes} ${ampm}`
-}
-
-// Format date for display
-function formatDateDisplay(date: string): string {
-  if (!date) return 'N/A'
-  const d = new Date(date)
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-}
+import { formatDate, formatTime } from '@/lib/utils'
 
 export default function BrowseShifts() {
   const [shifts, setShifts] = useState<Shift[]>([])
@@ -48,7 +33,6 @@ export default function BrowseShifts() {
         setUserId(user.id)
       }
 
-      // Query all shifts with open status - without join first
       const { data, error } = await supabase
         .from('shifts')
         .select('*')
@@ -64,9 +48,6 @@ export default function BrowseShifts() {
         })
         setShifts([])
       } else {
-        console.log('Loaded shifts:', data?.length || 0)
-        
-        // Now fetch profiles separately for each shift owner
         if (data && data.length > 0) {
           const uniqueUserIds = [...new Set(data.map(s => s.user_id))]
           const { data: profiles } = await supabase
@@ -130,11 +111,10 @@ export default function BrowseShifts() {
       if (error) throw error
 
       toast({
-        title: 'Request sent!',
-        description: 'Your swap request has been sent to the shift owner.',
+        title: 'Swap requested! 🎉',
+        description: `Your request has been sent to ${shift.user?.full_name || 'the shift owner'}.`,
       })
 
-      // Remove the shift from the list or update its status
       setShifts(shifts.filter(s => s.id !== shift.id))
     } catch (error) {
       console.error('Error requesting swap:', error)
@@ -165,7 +145,7 @@ export default function BrowseShifts() {
     return (
       <div className="max-w-5xl mx-auto">
         <Skeleton className="h-10 w-48 mb-8" />
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <Skeleton className="h-10 flex-1" />
           <Skeleton className="h-10 w-40" />
         </div>
@@ -180,7 +160,10 @@ export default function BrowseShifts() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Browse Shifts</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Browse Shifts</h1>
+        <p className="text-muted-foreground">Find and request shifts from your colleagues</p>
+      </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -209,69 +192,112 @@ export default function BrowseShifts() {
 
       {/* Results */}
       {filteredShifts.length > 0 ? (
-        <div className="grid gap-6">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm text-muted-foreground">
+              {filteredShifts.length} shift{filteredShifts.length !== 1 ? 's' : ''} available
+            </p>
+            <Button variant="ghost" size="sm" onClick={() => loadShifts()}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
           {filteredShifts.map((shift) => (
-            <Card key={shift.id} className="bg-zinc-950 border-zinc-800">
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <Badge variant="outline" className="bg-teal-500/10 text-teal-500 border-teal-500/20 mb-2">
-                      {shift.status}
-                    </Badge>
-                    <CardTitle className="text-xl">{shift.position}</CardTitle>
-                  </div>
-                  <Badge variant="secondary">{shift.department}</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-teal-500" />
-                    <span>{formatDateDisplay(shift.date)}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-teal-500" />
-                    <span>{formatTimeDisplay(shift.start_time)} - {formatTimeDisplay(shift.end_time)}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <MapPin className="w-5 h-5 text-teal-500" />
-                    <span>{shift.location || 'No location'}</span>
-                  </div>
-                </div>
-
-                {shift.user && (
-                  <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
-                    <User className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">Posted by: {shift.user.full_name || 'Unknown'}</p>
-                      {shift.notes && (
-                        <p className="text-sm text-muted-foreground">{shift.notes}</p>
-                      )}
+            <Card key={shift.id} className="bg-card border-border hover:border-emerald-500/30 transition-colors">
+              <CardContent className="p-4 md:p-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex-1 space-y-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
+                        {shift.status}
+                      </Badge>
+                      <Badge variant="secondary">{shift.department}</Badge>
                     </div>
+                    <h3 className="text-lg font-semibold">{shift.position}</h3>
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        <span>{formatDate(shift.date, 'EEE, MMM d')}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        <span>{formatTime(shift.start_time)} - {formatTime(shift.end_time)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        <span>{shift.location || 'No location'}</span>
+                      </div>
+                    </div>
+                    {shift.user && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Avatar className="size-6">
+                          <AvatarFallback className="text-xs bg-secondary">
+                            {shift.user.full_name?.charAt(0) || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-muted-foreground">
+                          Posted by <span className="font-medium text-foreground">{shift.user.full_name || 'Unknown'}</span>
+                        </span>
+                      </div>
+                    )}
+                    {shift.notes && (
+                      <p className="text-sm text-muted-foreground bg-secondary/50 p-2 rounded">
+                        {shift.notes}
+                      </p>
+                    )}
                   </div>
-                )}
-
-                <Button 
-                  className="w-full bg-teal-600 hover:bg-teal-700"
-                  onClick={() => handleRequestSwap(shift)}
-                  disabled={requestingShift === shift.id || shift.user_id === userId}
-                >
-                  {requestingShift === shift.id ? 'Sending Request...' : 
-                   shift.user_id === userId ? 'Your Shift' : 'Request Swap'}
-                </Button>
+                  <div className="flex-shrink-0">
+                    {shift.user_id === userId ? (
+                      <Button disabled variant="outline" className="w-full md:w-auto">
+                        Your Shift
+                      </Button>
+                    ) : (
+                      <Button 
+                        className="bg-emerald-600 hover:bg-emerald-700 w-full md:w-auto"
+                        onClick={() => handleRequestSwap(shift)}
+                        disabled={requestingShift === shift.id}
+                      >
+                        {requestingShift === shift.id ? (
+                          <>
+                            <Send className="h-4 w-4 mr-2 animate-pulse" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-4 w-4 mr-2" />
+                            Request Swap
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
       ) : (
-        <Card className="bg-zinc-950 border-zinc-800">
+        <Card className="bg-card border-border">
           <CardContent className="p-12 text-center">
-            <p className="text-zinc-400 mb-2">No open shifts available.</p>
-            <p className="text-zinc-500 text-sm mb-4">Post a shift to make it available for swap.</p>
-            <Button variant="outline" onClick={() => loadShifts()}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
+            <CalendarOff className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-lg font-medium mb-2">No shifts available</p>
+            <p className="text-muted-foreground mb-4">
+              {searchTerm || departmentFilter !== 'all' 
+                ? 'Try adjusting your search or filters'
+                : 'When colleagues post shifts for swap, they\'ll appear here'}
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button variant="outline" onClick={() => loadShifts()}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+              <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+                <Link href="/dashboard/post">
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Post a Shift
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
