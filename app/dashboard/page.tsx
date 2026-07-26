@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Calendar, Users, Clock, TrendingUp, ArrowRight, PlusCircle, Sparkles, X } from 'lucide-react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Calendar, Users, Clock, TrendingUp, ArrowRight, PlusCircle, Sparkles, X, User, CalendarOff, Inbox } from 'lucide-react'
+import { useToast } from '@/components/ui/use-toast'
 import type { Profile, Shift, ShiftSwapRequest } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
 
@@ -18,7 +21,10 @@ export default function Dashboard() {
   const [pendingRequests, setPendingRequests] = useState<ShiftSwapRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [showWelcome, setShowWelcome] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const supabase = createClient()
+  const { toast } = useToast()
+  const router = useRouter()
 
   useEffect(() => {
     async function loadData() {
@@ -29,6 +35,8 @@ export default function Dashboard() {
           setLoading(false)
           return
         }
+
+        setCurrentUserId(authUser.id)
 
         // Get user profile
         const { data: profile } = await supabase
@@ -43,14 +51,30 @@ export default function Dashboard() {
           setShowWelcome(true)
         }
 
-        // Get open shifts (available for swap)
+        // Get open shifts (available for swap) with user info
         const { data: shifts } = await supabase
           .from('shifts')
-          .select('*, user:profiles(*)')
+          .select('*')
           .eq('status', 'open')
           .order('date', { ascending: true })
           .limit(5)
-        setOpenShifts(shifts || [])
+
+        // Fetch profiles separately
+        if (shifts && shifts.length > 0) {
+          const uniqueUserIds = [...new Set(shifts.map(s => s.user_id))]
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('*')
+            .in('id', uniqueUserIds)
+          const profileMap = new Map(profiles?.map(p => [p.id, p]) || [])
+          const shiftsWithUsers = shifts.map(shift => ({
+            ...shift,
+            user: profileMap.get(shift.user_id)
+          }))
+          setOpenShifts(shiftsWithUsers)
+        } else {
+          setOpenShifts([])
+        }
 
         // Get user's own shifts
         const { data: myShiftData } = await supabase
@@ -61,7 +85,7 @@ export default function Dashboard() {
           .limit(5)
         setMyShifts(myShiftData || [])
 
-        // Get pending swap requests for this user
+        // Get pending swap requests where user is the target (shift owner)
         const { data: requests } = await supabase
           .from('shift_swap_requests')
           .select('*, shift:shifts(*), requester:profiles(*)')
@@ -79,18 +103,42 @@ export default function Dashboard() {
     loadData()
   }, [])
 
-  const handleApproveRequest = async (requestId: string) => {
+  const handleApproveRequest = async (request: ShiftSwapRequest) => {
     try {
-      const { error } = await supabase
+      // Update request status
+      const { error: requestError } = await supabase
         .from('shift_swap_requests')
         .update({ status: 'approved' })
-        .eq('id', requestId)
+        .eq('id', request.id)
 
-      if (!error) {
-        setPendingRequests(requests => requests.filter(r => r.id !== requestId))
-      }
+      if (requestError) throw requestError
+
+      // Update shift to be filled
+      const { error: shiftError } = await supabase
+        .from('shifts')
+        .update({ 
+          user_id: request.requester_id,
+          status: 'filled'
+        })
+        .eq('id', request.shift_id)
+
+      if (shiftError) throw shiftError
+
+      toast({
+        title: 'Swap approved!',
+        description: `The shift has been assigned to ${request.requester?.full_name || 'the requester'}.`,
+      })
+
+      setPendingRequests(requests => requests.filter(r => r.id !== request.id))
+      // Refresh the page to show updated data
+      router.refresh()
     } catch (error) {
       console.error('Error approving request:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to approve request. Please try again.',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -101,11 +149,38 @@ export default function Dashboard() {
         .update({ status: 'rejected' })
         .eq('id', requestId)
 
-      if (!error) {
-        setPendingRequests(requests => requests.filter(r => r.id !== requestId))
-      }
+      if (error) throw error
+
+      toast({
+        title: 'Request declined',
+        description: 'The swap request has been declined.',
+      })
+
+      setPendingRequests(requests => requests.filter(r => r.id !== requestId))
     } catch (error) {
       console.error('Error rejecting request:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to decline request. Please try again.',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const getStatusBadge = (status: Shift['status']) => {
+    switch (status) {
+      case 'open':
+        return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Open</Badge>
+      case 'filled':
+        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Filled</Badge>
+      case 'scheduled':
+        return <Badge variant="secondary">Scheduled</Badge>
+      case 'completed':
+        return <Badge variant="outline">Completed</Badge>
+      case 'cancelled':
+        return <Badge variant="destructive">Cancelled</Badge>
+      default:
+        return <Badge>{status}</Badge>
     }
   }
 
@@ -116,10 +191,10 @@ export default function Dashboard() {
           <Skeleton className="h-10 w-64 mb-2" />
           <Skeleton className="h-5 w-96" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="bg-zinc-950 border-zinc-800">
-              <CardHeader>
+            <Card key={i} className="bg-card border-border">
+              <CardHeader className="pb-2">
                 <Skeleton className="h-4 w-24" />
               </CardHeader>
               <CardContent>
@@ -129,42 +204,47 @@ export default function Dashboard() {
             </Card>
           ))}
         </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map(i => (
+            <Skeleton key={i} className="h-48 w-full" />
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold">
-          Welcome back, {user?.full_name?.split(' ')[0] || 'User'}
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">
+          Welcome back, {user?.full_name?.split(' ')[0] || 'User'} 👋
         </h1>
-        <p className="text-zinc-400">Here's what's happening with your shifts today</p>
+        <p className="text-muted-foreground">Here's what's happening with your shifts</p>
       </div>
 
       {/* Welcome Banner for First-Time Users */}
       {showWelcome && (
-        <div className="mb-8 bg-gradient-to-r from-teal-500/10 to-teal-600/10 border border-teal-500/20 rounded-xl p-6">
+        <div className="mb-8 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-xl p-6">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-teal-500/20 rounded-lg">
-                <Sparkles className="h-6 w-6 text-teal-500" />
+              <div className="p-3 bg-emerald-500/20 rounded-lg">
+                <Sparkles className="h-6 w-6 text-emerald-500" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white mb-1">
-                  👋 Welcome to ShiftSwap!
+                <h2 className="text-xl font-bold mb-1">
+                  Welcome to ShiftSwap!
                 </h2>
-                <p className="text-zinc-300 mb-4">
-                  Get started by setting up your profile. This helps colleagues recognize you when swapping shifts.
+                <p className="text-muted-foreground mb-4">
+                  Get started by setting up your profile and posting your first shift.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <Button asChild className="bg-teal-600 hover:bg-teal-700">
+                  <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
                     <Link href="/dashboard/profile">
                       <Sparkles className="mr-2 h-4 w-4" />
                       Complete Profile
                     </Link>
                   </Button>
-                  <Button asChild variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                  <Button asChild variant="outline">
                     <Link href="/dashboard/post">
                       <PlusCircle className="mr-2 h-4 w-4" />
                       Post Your First Shift
@@ -175,7 +255,7 @@ export default function Dashboard() {
             </div>
             <button
               onClick={() => setShowWelcome(false)}
-              className="text-zinc-500 hover:text-zinc-300"
+              className="text-muted-foreground hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>
@@ -184,48 +264,48 @@ export default function Dashboard() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card className="bg-zinc-950 border-zinc-800">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium">Open Shifts</CardTitle>
-            <Users className="h-5 w-5 text-teal-500" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <Card className="bg-card border-border">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Open Shifts</CardTitle>
+            <Users className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{openShifts.length}</div>
-            <p className="text-xs text-zinc-500">Available for swap</p>
+            <div className="text-2xl md:text-3xl font-bold">{openShifts.length}</div>
+            <p className="text-xs text-muted-foreground">Available for swap</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-950 border-zinc-800">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium">My Shifts</CardTitle>
-            <Calendar className="h-5 w-5 text-teal-500" />
+        <Card className="bg-card border-border">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">My Shifts</CardTitle>
+            <Calendar className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{myShifts.length}</div>
-            <p className="text-xs text-zinc-500">Upcoming shifts</p>
+            <div className="text-2xl md:text-3xl font-bold">{myShifts.length}</div>
+            <p className="text-xs text-muted-foreground">Upcoming shifts</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-950 border-zinc-800">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
-            <Clock className="h-5 w-5 text-amber-500" />
+        <Card className="bg-card border-border">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Pending</CardTitle>
+            <Clock className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{pendingRequests.length}</div>
-            <p className="text-xs text-zinc-500">Awaiting your response</p>
+            <div className="text-2xl md:text-3xl font-bold">{pendingRequests.length}</div>
+            <p className="text-xs text-muted-foreground">Awaiting response</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-950 border-zinc-800">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-            <TrendingUp className="h-5 w-5 text-teal-500" />
+        <Card className="bg-card border-border">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">My Requests</CardTitle>
+            <TrendingUp className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">-</div>
-            <p className="text-xs text-zinc-500">Need more data</p>
+            <div className="text-2xl md:text-3xl font-bold">-</div>
+            <p className="text-xs text-muted-foreground">Track your swaps</p>
           </CardContent>
         </Card>
       </div>
@@ -233,37 +313,48 @@ export default function Dashboard() {
       {/* Pending Swap Requests */}
       {pendingRequests.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Pending Swap Requests</h2>
-          <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-xl font-semibold">Pending Requests</h2>
+            <Badge variant="secondary" className="bg-amber-500/10 text-amber-500">{pendingRequests.length}</Badge>
+          </div>
+          <div className="space-y-3">
             {pendingRequests.map((request) => (
-              <Card key={request.id} className="bg-zinc-950 border-zinc-800">
+              <Card key={request.id} className="bg-card border-border overflow-hidden">
                 <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">
-                        {request.requester?.full_name || 'Someone'} wants your shift
-                      </p>
-                      <p className="text-sm text-zinc-400">
-                        {request.shift?.date && formatDate(request.shift.date)} • {request.shift?.position}
-                      </p>
-                      {request.message && (
-                        <p className="text-sm text-zinc-500 mt-1">"{request.message}"</p>
-                      )}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <Avatar className="size-10">
+                        <AvatarFallback className="bg-emerald-500/10 text-emerald-500 text-sm">
+                          {request.requester?.full_name?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">
+                          {request.requester?.full_name || 'Someone'} wants your shift
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {request.shift?.position} • {request.shift?.date && formatDate(request.shift.date, 'MMM d')}
+                        </p>
+                        {request.message && (
+                          <p className="text-sm text-muted-foreground mt-1 italic">"{request.message}"</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        className="bg-teal-600 hover:bg-teal-700"
-                        onClick={() => handleApproveRequest(request.id)}
-                      >
-                        Approve
-                      </Button>
+                    <div className="flex gap-2 ml-13 md:ml-0">
                       <Button 
                         size="sm" 
                         variant="outline"
                         onClick={() => handleRejectRequest(request.id)}
+                        className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
                       >
                         Decline
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-emerald-600 hover:bg-emerald-700"
+                        onClick={() => handleApproveRequest(request)}
+                      >
+                        Approve
                       </Button>
                     </div>
                   </div>
@@ -277,8 +368,8 @@ export default function Dashboard() {
       {/* Open Shifts */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">Open Shifts</h2>
-          <Button asChild variant="outline" size="sm">
+          <h2 className="text-xl font-semibold">Open Shifts</h2>
+          <Button asChild variant="ghost" size="sm">
             <Link href="/dashboard/browse">
               View All <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
@@ -287,40 +378,55 @@ export default function Dashboard() {
         {openShifts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {openShifts.map((shift) => (
-              <Card key={shift.id} className="bg-zinc-950 border-zinc-800">
+              <Card key={shift.id} className="bg-card border-border hover:border-emerald-500/30 transition-colors">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="bg-teal-500/10 text-teal-500 border-teal-500/20">
-                      {shift.status}
-                    </Badge>
-                    <span className="text-sm text-zinc-500">{shift.department}</span>
+                    {getStatusBadge(shift.status)}
+                    <span className="text-xs text-muted-foreground">{shift.department}</span>
                   </div>
                   <CardTitle className="text-lg">{shift.position}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-zinc-400 mb-2">
-                    {formatDate(shift.date, 'EEEE, MMM d, yyyy')}
-                  </p>
-                  <p className="text-sm text-zinc-400">
-                    {formatTime(shift.start_time)} - {formatTime(shift.end_time)}
-                  </p>
-                  {shift.location && (
-                    <p className="text-sm text-zinc-500 mt-1">{shift.location}</p>
-                  )}
-                  <div className="mt-4">
-                    <Button size="sm" className="w-full bg-teal-600 hover:bg-teal-700">
-                      Request Swap
-                    </Button>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="w-4 h-4" />
+                    <span>{formatDate(shift.date, 'EEE, MMM d')}</span>
                   </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    <span>{formatTime(shift.start_time)} - {formatTime(shift.end_time)}</span>
+                  </div>
+                  {shift.user && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Avatar className="size-6">
+                        <AvatarFallback className="bg-secondary text-xs">
+                          {shift.user.full_name?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-muted-foreground">Posted by {shift.user.full_name || 'Unknown'}</span>
+                    </div>
+                  )}
+                  {shift.user_id === currentUserId ? (
+                    <Button size="sm" className="w-full" disabled variant="outline">
+                      Your Shift
+                    </Button>
+                  ) : (
+                    <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700" asChild>
+                      <Link href="/dashboard/browse">
+                        Request Swap
+                      </Link>
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <Card className="bg-zinc-950 border-zinc-800">
+          <Card className="bg-card border-border">
             <CardContent className="p-8 text-center">
-              <p className="text-zinc-400">No open shifts available at the moment.</p>
-              <Button asChild className="mt-4 bg-teal-600 hover:bg-teal-700">
+              <CalendarOff className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-lg font-medium mb-2">No open shifts available</p>
+              <p className="text-muted-foreground mb-4">When colleagues post shifts for swap, they'll appear here.</p>
+              <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
                 <Link href="/dashboard/post">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Post a Shift
@@ -333,7 +439,7 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Button asChild className="bg-teal-600 hover:bg-teal-700 h-auto py-4">
+        <Button asChild className="bg-emerald-600 hover:bg-emerald-700 h-auto py-4">
           <Link href="/dashboard/post">
             <PlusCircle className="mr-2 h-5 w-5" />
             Post a Shift
