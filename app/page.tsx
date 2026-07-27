@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, ArrowLeftRight, Shield, CheckCircle, Clock, Zap, Bell, BarChart3, MessageSquare, Settings, Layout, ChevronRight, Mail, Github, Linkedin } from 'lucide-react';
+import { Calendar, ArrowLeftRight, Shield, CheckCircle, Clock, Zap, Bell, BarChart3, MessageSquare, Settings, Layout, ChevronRight, Mail, Github } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -483,10 +483,7 @@ export default function Home() {
                 <a href="https://github.com/akuruloagoziem2006-tech/Shift-Swap-Hub" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                   <Github className="size-5" />
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                  <Linkedin className="size-5" />
-                </a>
-                <a href="mailto:contact@shiftswap.app" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a href="mailto:akuruloagoziem2006@gmail.com" className="text-muted-foreground hover:text-foreground transition-colors">
                   <Mail className="size-5" />
                 </a>
               </div>
@@ -507,9 +504,8 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="mailto:contact@shiftswap.app" className="hover:text-foreground transition-colors">Contact</a></li>
+                <li><a href="mailto:akuruloagoziem2006@gmail.com" className="hover:text-foreground transition-colors">Contact</a></li>
                 <li><a href="https://github.com/akuruloagoziem2006-tech/Shift-Swap-Hub" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">GitHub</a></li>
-                <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">LinkedIn</a></li>
               </ul>
             </div>
 
@@ -517,9 +513,8 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Cookie Policy</a></li>
+                <li><a href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms" className="hover:text-foreground transition-colors">Terms of Service</a></li>
               </ul>
             </div>
           </div>
