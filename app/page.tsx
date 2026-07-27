@@ -435,9 +435,9 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Link href="mailto:contact@shiftswap.app" className="block">
+              <a href="mailto:akuruloagoziem2006@gmail.com?subject=Enterprise%20Inquiry" className="block">
                 <Button variant="outline" className="w-full">Contact Sales</Button>
-              </Link>
+              </a>
             </div>
           </div>
         </div>
