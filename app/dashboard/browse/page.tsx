@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Calendar, MapPin, Clock, Search, User, RefreshCw, Filter, CalendarOff, PlusCircle, Send } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Calendar, MapPin, Clock, Search, User, RefreshCw, Filter, CalendarOff, PlusCircle, Send, Trash2 } from 'lucide-react'
 import type { Shift } from '@/lib/types'
 import { useToast } from '@/components/ui/use-toast'
 import { formatDate, formatTime } from '@/lib/utils'
@@ -22,6 +23,9 @@ export default function BrowseShifts() {
   const [departmentFilter, setDepartmentFilter] = useState<string>('all')
   const [requestingShift, setRequestingShift] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [shiftToDelete, setShiftToDelete] = useState<Shift | null>(null)
+  const [deleting, setDeleting] = useState(false)
   const supabase = createClient()
   const { toast } = useToast()
 
@@ -125,6 +129,43 @@ export default function BrowseShifts() {
       })
     } finally {
       setRequestingShift(null)
+    }
+  }
+
+  const handleDeleteShift = async () => {
+    if (!shiftToDelete) return
+    
+    setDeleting(true)
+    try {
+      const { error } = await supabase
+        .from('shifts')
+        .delete()
+        .eq('id', shiftToDelete.id)
+        .eq('user_id', userId!)
+
+      if (error) {
+        console.error('Delete error:', error)
+        throw error
+      }
+
+      toast({
+        title: 'Shift deleted',
+        description: 'The shift has been permanently removed.',
+        className: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500',
+      })
+
+      setShifts(shifts => shifts.filter(s => s.id !== shiftToDelete.id))
+      setDeleteDialogOpen(false)
+      setShiftToDelete(null)
+    } catch (error) {
+      console.error('Error deleting shift:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to delete shift. Please try again.',
+        variant: 'destructive',
+      })
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -248,9 +289,19 @@ export default function BrowseShifts() {
                   </div>
                   <div className="flex-shrink-0">
                     {shift.user_id === userId ? (
-                      <Button disabled variant="outline" className="w-full md:w-auto">
-                        Your Shift
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                          onClick={() => {
+                            setShiftToDelete(shift)
+                            setDeleteDialogOpen(true)
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </Button>
+                      </div>
                     ) : (
                       <Button 
                         className="bg-emerald-600 hover:bg-emerald-700 w-full md:w-auto"
@@ -301,6 +352,38 @@ export default function BrowseShifts() {
           </CardContent>
         </Card>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Shift</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this shift? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {shiftToDelete && (
+            <div className="p-4 bg-secondary/50 rounded-lg my-4">
+              <p className="font-medium">{shiftToDelete.position}</p>
+              <p className="text-sm text-muted-foreground">
+                {formatDate(shiftToDelete.date, 'EEEE, MMM d')} • {formatTime(shiftToDelete.start_time)} - {formatTime(shiftToDelete.end_time)}
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteShift}
+              disabled={deleting}
+            >
+              {deleting ? 'Deleting...' : 'Delete Shift'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
