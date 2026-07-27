@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, ArrowLeftRight, Shield, CheckCircle, Clock, Star, Zap, Bell, BarChart3, MessageSquare, Settings, Layout, ChevronRight, Mail, Github, Linkedin } from 'lucide-react';
+import { Calendar, ArrowLeftRight, Shield, CheckCircle, Clock, Zap, Bell, BarChart3, MessageSquare, Settings, Layout, ChevronRight, Mail, Github, Linkedin } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -439,53 +439,6 @@ export default function Home() {
                 <Button variant="outline" className="w-full">Contact Sales</Button>
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-24 px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="flex items-center justify-center gap-1 mb-4">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="size-5 text-yellow-500 fill-yellow-500" />
-              ))}
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Loved by shift workers and managers
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              See what teams across healthcare, retail, hospitality, and more have to say.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { name: 'Maria K.', role: 'Registered Nurse', quote: 'Finally, a simple way to handle shift swaps. Before ShiftSwap, it was endless group chats and missed messages.' },
-              { name: 'James T.', role: 'Shift Manager', quote: 'Managing approvals used to be a nightmare. Now I can review and approve swap requests in seconds.' },
-              { name: 'Sarah L.', role: 'Retail Team Lead', quote: 'Our team loves how easy it is to swap shifts. It\'s reduced scheduling conflicts by at least 80%.' },
-            ].map((testimonial, i) => (
-              <Card key={i} className="bg-card border-border">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="size-4 text-yellow-500 fill-yellow-500" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4">"{testimonial.quote}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-                      <span className="text-sm font-medium text-white">{testimonial.name.split(' ').map(n => n[0]).join('')}</span>
-                    </div>
-                    <div>
-                      <p className="font-medium">{testimonial.name}</p>
-                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
