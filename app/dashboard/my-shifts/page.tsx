@@ -119,27 +119,54 @@ export default function MyShifts() {
     
     setDeleting(true)
     try {
-      const { error } = await supabase
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) {
+        throw new Error('Not authenticated')
+      }
+
+      // First verify the shift belongs to this user
+      const { data: shiftToCheck, error: checkError } = await supabase
+        .from('shifts')
+        .select('user_id')
+        .eq('id', shiftToDelete.id)
+        .single()
+
+      if (checkError || !shiftToCheck) {
+        throw new Error('Shift not found')
+      }
+
+      if (shiftToCheck.user_id !== user.id) {
+        throw new Error('You do not have permission to delete this shift')
+      }
+
+      // Delete the shift
+      const { error: deleteError } = await supabase
         .from('shifts')
         .delete()
         .eq('id', shiftToDelete.id)
+        .eq('user_id', user.id) // Double-check user_id matches
 
-      if (error) throw error
+      if (deleteError) {
+        console.error('Delete error:', deleteError)
+        throw deleteError
+      }
 
       toast({
         title: 'Shift deleted',
-        description: 'The shift has been removed.',
+        description: 'The shift has been permanently removed.',
+        className: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500',
       })
 
       setShifts(shifts => shifts.filter(s => s.id !== shiftToDelete.id))
       setDeleteDialogOpen(false)
       setShiftToDelete(null)
-      router.refresh()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting shift:', error)
       toast({
         title: 'Error',
-        description: 'Failed to delete shift. Please try again.',
+        description: error.message || 'Failed to delete shift. Please try again.',
         variant: 'destructive',
       })
     } finally {

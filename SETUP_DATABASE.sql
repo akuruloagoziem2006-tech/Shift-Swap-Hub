@@ -75,6 +75,14 @@ CREATE POLICY "Managers can update any shifts" ON shifts FOR UPDATE USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('manager', 'admin'))
 );
 
+DROP POLICY IF EXISTS "Users can delete own shifts" ON shifts;
+CREATE POLICY "Users can delete own shifts" ON shifts FOR DELETE USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Managers can delete any shifts" ON shifts;
+CREATE POLICY "Managers can delete any shifts" ON shifts FOR DELETE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('manager', 'admin'))
+);
+
 -- Swap Requests RLS Policies
 DROP POLICY IF EXISTS "Users can view swap requests" ON shift_swap_requests;
 CREATE POLICY "Users can view swap requests" ON shift_swap_requests FOR SELECT USING (true);
@@ -87,6 +95,14 @@ CREATE POLICY "Users can update own requests" ON shift_swap_requests FOR UPDATE 
 
 DROP POLICY IF EXISTS "Managers can update any requests" ON shift_swap_requests;
 CREATE POLICY "Managers can update any requests" ON shift_swap_requests FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('manager', 'admin'))
+);
+
+DROP POLICY IF EXISTS "Users can delete own requests" ON shift_swap_requests;
+CREATE POLICY "Users can delete own requests" ON shift_swap_requests FOR DELETE USING (auth.uid() = requester_id);
+
+DROP POLICY IF EXISTS "Managers can delete any requests" ON shift_swap_requests;
+CREATE POLICY "Managers can delete any requests" ON shift_swap_requests FOR DELETE USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('manager', 'admin'))
 );
 
