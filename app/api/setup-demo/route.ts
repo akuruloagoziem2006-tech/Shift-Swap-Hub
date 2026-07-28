@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export async function POST() {
+async function setupDemoAccount() {
   // Create Supabase client with service role key for admin operations
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,10 +22,10 @@ export async function POST() {
     });
 
     if (authError) {
-      return NextResponse.json(
-        { error: 'Demo user not found. Please create the demo user in Supabase Auth first.' },
-        { status: 404 }
-      );
+      return { 
+        error: 'Demo user not found. Please create the demo user in Supabase Auth first.', 
+        status: 404 
+      };
     }
 
     const userId = authData.user.id;
@@ -51,10 +51,11 @@ export async function POST() {
 
       if (profileError) {
         console.error('Profile creation error:', profileError);
-        return NextResponse.json(
-          { error: 'Failed to create profile', details: profileError },
-          { status: 500 }
-        );
+        return { 
+          error: 'Failed to create profile', 
+          details: profileError,
+          status: 500
+        };
       }
     }
 
@@ -103,24 +104,39 @@ export async function POST() {
 
       if (shiftsError) {
         console.error('Shifts creation error:', shiftsError);
-        return NextResponse.json(
-          { error: 'Failed to create shifts', details: shiftsError },
-          { status: 500 }
-        );
+        return { 
+          error: 'Failed to create shifts', 
+          details: shiftsError,
+          status: 500
+        };
       }
     }
 
-    return NextResponse.json({
+    return {
       success: true,
       message: 'Demo account setup complete',
       userId,
-    });
+    };
 
   } catch (error: any) {
     console.error('Setup error:', error);
-    return NextResponse.json(
-      { error: 'Setup failed', details: error.message },
-      { status: 500 }
-    );
+    return { 
+      error: 'Setup failed', 
+      details: error.message,
+      status: 500
+    };
   }
+}
+
+// Support both GET and POST
+export async function GET() {
+  const result = await setupDemoAccount();
+  const status = result.status || 200;
+  return NextResponse.json(result, { status });
+}
+
+export async function POST() {
+  const result = await setupDemoAccount();
+  const status = result.status || 200;
+  return NextResponse.json(result, { status });
 }
