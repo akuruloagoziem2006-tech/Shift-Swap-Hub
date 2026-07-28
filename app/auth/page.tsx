@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Mail, Lock, User, AlertCircle, ArrowRight, Github, ArrowLeftRight, Calendar, Shield } from 'lucide-react';
+import { Loader2, Mail, Lock, User, AlertCircle, ArrowRight, Github, ArrowLeftRight, Calendar, Shield, Play } from 'lucide-react';
 
 type AuthMode = 'signin' | 'signup' | 'reset';
 
@@ -22,6 +22,7 @@ function AuthPageContent() {
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -120,6 +121,23 @@ function AuthPageContent() {
     if (error) {
       setError(getErrorMessage(error.message));
       setSocialLoading(null);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setDemoLoading(true);
+    setError(null);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: 'demo@shiftswap.app',
+      password: 'demo1234',
+    });
+
+    if (error) {
+      setError('Demo account is not available. Please sign up for a new account.');
+      setDemoLoading(false);
+    } else {
+      window.location.href = '/dashboard';
     }
   };
 
@@ -285,6 +303,30 @@ function AuthPageContent() {
               <span className="font-medium">Continue with GitHub</span>
             </Button>
           </div>
+
+          {/* Try Demo Button */}
+          <Button
+            type="button"
+            size="lg"
+            onClick={handleDemoLogin}
+            disabled={demoLoading}
+            className="w-full h-12 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-lg shadow-emerald-500/25 font-semibold"
+          >
+            {demoLoading ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Loading demo...
+              </>
+            ) : (
+              <>
+                <Play className="mr-2 h-5 w-5" />
+                Try Demo
+              </>
+            )}
+          </Button>
+          <p className="text-xs text-muted-foreground text-center">
+            Explore the app with sample data — no signup required
+          </p>
 
           {/* Divider */}
           <div className="relative mb-8">
