@@ -310,10 +310,12 @@ export default function ManagerApprovals() {
           ) : (
             <Card className="bg-card border-border">
               <CardContent className="p-12 text-center">
-                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-                <p className="text-lg font-medium mb-2">All caught up!</p>
-                <p className="text-muted-foreground">
-                  No pending swap requests to review.
+                <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-500" />
+                </div>
+                <p className="text-xl font-semibold mb-2">All caught up! 🎉</p>
+                <p className="text-muted-foreground max-w-md mx-auto">
+                  No pending swap requests to review. Your team is all set!
                 </p>
               </CardContent>
             </Card>
@@ -362,10 +364,12 @@ export default function ManagerApprovals() {
           ) : (
             <Card className="bg-card border-border">
               <CardContent className="p-12 text-center">
-                <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-lg font-medium mb-2">No profiles found</p>
-                <p className="text-muted-foreground">
-                  Profiles will appear here once users sign up.
+                <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
+                  <Users className="w-12 h-12 text-emerald-500" />
+                </div>
+                <p className="text-xl font-semibold mb-2">No team members yet</p>
+                <p className="text-muted-foreground max-w-md mx-auto">
+                  Once your team members sign up, they'll appear here.
                 </p>
               </CardContent>
             </Card>

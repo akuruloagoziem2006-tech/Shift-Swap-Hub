@@ -25,6 +25,7 @@ import {
   Shield,
   CheckSquare,
   CalendarDays,
+  MessageSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
@@ -100,6 +101,17 @@ export function DashboardSidebar() {
           </Link>
         )
       })}
+
+      {/* Feedback Link */}
+      <div className="pt-4 mt-4 border-t border-border">
+        <a
+          href="mailto:akuruloagoziem2006@gmail.com?subject=ShiftSwap Feedback"
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+        >
+          <MessageSquare className="size-5" />
+          Got feedback? Email me
+        </a>
+      </div>
     </nav>
   )
 

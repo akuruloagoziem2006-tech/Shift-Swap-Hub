@@ -304,37 +304,39 @@ function AuthPageContent() {
             </Button>
           </div>
 
-          {/* Try Demo Button */}
-          <Button
-            type="button"
-            size="lg"
-            onClick={handleDemoLogin}
-            disabled={demoLoading}
-            className="w-full h-12 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-lg shadow-emerald-500/25 font-semibold"
-          >
-            {demoLoading ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Loading demo...
-              </>
-            ) : (
-              <>
-                <Play className="mr-2 h-5 w-5" />
-                Try Demo
-              </>
-            )}
-          </Button>
-          <p className="text-xs text-muted-foreground text-center">
-            Explore the app with sample data — no signup required
-          </p>
+          {/* Try Demo Button - Prominent Hero Style */}
+          <div className="relative mb-6 p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/20">
+            <Button
+              type="button"
+              size="lg"
+              onClick={handleDemoLogin}
+              disabled={demoLoading}
+              className="w-full h-14 bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 hover:from-emerald-400 hover:via-emerald-500 hover:to-emerald-600 shadow-xl shadow-emerald-500/30 font-bold text-lg transition-all duration-300 hover:scale-[1.02]"
+            >
+              {demoLoading ? (
+                <>
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                  Launching demo...
+                </>
+              ) : (
+                <>
+                  <Play className="mr-3 h-6 w-6" />
+                  Try Demo — It's Free!
+                </>
+              )}
+            </Button>
+            <p className="text-sm text-emerald-400/80 text-center mt-3">
+              No signup needed • Explore with sample data instantly
+            </p>
+          </div>
 
           {/* Divider */}
-          <div className="relative mb-8">
+          <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-background px-4 text-muted-foreground">or continue with email</span>
+              <span className="bg-background px-4 text-muted-foreground">or sign in with email</span>
             </div>
           </div>
 
@@ -401,6 +403,18 @@ function AuthPageContent() {
           {/* Sign Up Form */}
           {mode === 'signup' && (
             <form onSubmit={handleSignUp} className="space-y-5">
+              {/* Demo option for signup */}
+              <div className="text-center pb-2">
+                <span className="text-sm text-muted-foreground">Want to explore first? </span>
+                <button
+                  type="button"
+                  onClick={() => { setMode('signin'); setError(null); }}
+                  className="text-sm text-emerald-500 hover:text-emerald-400 font-medium"
+                >
+                  Try the demo →
+                </button>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="signup-name" className="text-sm font-medium">Full Name</Label>
                 <div className="relative">

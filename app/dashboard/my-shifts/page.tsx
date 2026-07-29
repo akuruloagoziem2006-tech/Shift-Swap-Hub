@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
-import { Calendar, Clock, MapPin, PlusCircle, Trash2, ArrowRightLeft, CalendarOff, Send } from 'lucide-react'
+import { Calendar, Clock, MapPin, PlusCircle, Trash2, ArrowRightLeft, CalendarOff, Send, Search } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import type { Shift, ShiftSwapRequest } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
@@ -305,9 +305,13 @@ export default function MyShifts() {
         ) : (
           <Card className="bg-card border-border">
             <CardContent className="p-12 text-center">
-              <CalendarOff className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-medium mb-2">No shifts yet</p>
-              <p className="text-muted-foreground mb-4">Post your first shift to get started.</p>
+              <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
+                <CalendarOff className="w-12 h-12 text-emerald-500" />
+              </div>
+              <p className="text-xl font-semibold mb-2">No shifts yet</p>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                You haven't posted any shifts for swap. Post your first shift and let colleagues know you're available!
+              </p>
               <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
                 <Link href="/dashboard/post">
                   <PlusCircle className="mr-2 h-4 w-4" />
@@ -390,11 +394,16 @@ export default function MyShifts() {
         ) : (
           <Card className="bg-card border-border">
             <CardContent className="p-12 text-center">
-              <ArrowRightLeft className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-medium mb-2">No swap requests yet</p>
-              <p className="text-muted-foreground mb-4">Browse available shifts to request a swap.</p>
-              <Button asChild variant="outline">
+              <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
+                <ArrowRightLeft className="w-12 h-12 text-emerald-500" />
+              </div>
+              <p className="text-xl font-semibold mb-2">No swap requests yet</p>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                You haven't requested any shifts. Browse available shifts and request coverage from your colleagues!
+              </p>
+              <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
                 <Link href="/dashboard/browse">
+                  <Search className="mr-2 h-4 w-4" />
                   Browse Available Shifts
                 </Link>
               </Button>

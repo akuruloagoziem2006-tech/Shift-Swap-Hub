@@ -330,14 +330,24 @@ export default function BrowseShifts() {
       ) : (
         <Card className="bg-card border-border">
           <CardContent className="p-12 text-center">
-            <CalendarOff className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg font-medium mb-2">No shifts available</p>
-            <p className="text-muted-foreground mb-4">
+            <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
+              <CalendarOff className="w-12 h-12 text-emerald-500" />
+            </div>
+            <p className="text-xl font-semibold mb-2">No shifts available</p>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               {searchTerm || departmentFilter !== 'all' 
-                ? 'Try adjusting your search or filters'
-                : 'When colleagues post shifts for swap, they\'ll appear here'}
+                ? 'No shifts match your search. Try adjusting your filters.'
+                : 'When colleagues post shifts for swap, they\'ll appear here. Be the first to post!'}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
+              {(searchTerm || departmentFilter !== 'all') && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => { setSearchTerm(''); setDepartmentFilter('all'); }}
+                >
+                  Clear Filters
+                </Button>
+              )}
               <Button variant="outline" onClick={() => loadShifts()}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
@@ -345,7 +355,7 @@ export default function BrowseShifts() {
               <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
                 <Link href="/dashboard/post">
                   <PlusCircle className="h-4 w-4 mr-2" />
-                  Post a Shift
+                  Post Your First Shift
                 </Link>
               </Button>
             </div>

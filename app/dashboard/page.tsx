@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Calendar, Users, Clock, TrendingUp, ArrowRight, PlusCircle, Sparkles, X, User, CalendarOff, Inbox } from 'lucide-react'
+import { Calendar, Users, Clock, TrendingUp, ArrowRight, PlusCircle, Sparkles, X, User, CalendarOff, Inbox, Share2, CheckCircle, Mail } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import type { Profile, Shift, ShiftSwapRequest } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
@@ -222,6 +222,43 @@ export default function Dashboard() {
         <p className="text-muted-foreground">Here's what's happening with your shifts</p>
       </div>
 
+      {/* How It Works */}
+      <div className="mb-8 bg-gradient-to-br from-emerald-500/5 via-emerald-500/10 to-transparent border border-emerald-500/20 rounded-xl p-6">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-emerald-500" />
+          How ShiftSwap Works
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-emerald-500/10 rounded-lg h-fit">
+              <Share2 className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div>
+              <h3 className="font-medium mb-1">1. Post Your Shift</h3>
+              <p className="text-sm text-muted-foreground">Can't make it? Post your shift as available for swap.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-emerald-500/10 rounded-lg h-fit">
+              <Users className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div>
+              <h3 className="font-medium mb-1">2. Request a Swap</h3>
+              <p className="text-sm text-muted-foreground">Browse available shifts and request coverage from colleagues.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-emerald-500/10 rounded-lg h-fit">
+              <CheckCircle className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div>
+              <h3 className="font-medium mb-1">3. Get Approved</h3>
+              <p className="text-sm text-muted-foreground">Managers approve swaps to keep your team covered.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Welcome Banner for First-Time Users */}
       {showWelcome && (
         <div className="mb-8 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-xl p-6">
@@ -422,16 +459,27 @@ export default function Dashboard() {
           </div>
         ) : (
           <Card className="bg-card border-border">
-            <CardContent className="p-8 text-center">
-              <CalendarOff className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-medium mb-2">No open shifts available</p>
-              <p className="text-muted-foreground mb-4">When colleagues post shifts for swap, they'll appear here.</p>
-              <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-                <Link href="/dashboard/post">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Post a Shift
-                </Link>
-              </Button>
+            <CardContent className="p-12 text-center">
+              <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
+                <CalendarOff className="w-12 h-12 text-emerald-500" />
+              </div>
+              <p className="text-xl font-semibold mb-2">No open shifts available</p>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                When colleagues post shifts for swap, they'll appear here. Be the first to post!
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+                  <Link href="/dashboard/post">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Post a Shift
+                  </Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/dashboard/browse">
+                    Browse All
+                  </Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
