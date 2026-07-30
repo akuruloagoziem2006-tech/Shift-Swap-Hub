@@ -16,13 +16,15 @@ ShiftSwap helps teams in hospitals, restaurants, retail, and similar industries 
 
 ## Screenshots
 
+> 📸 Screenshots coming soon! Visit the [live demo](https://shift-swap-hub-alpha.vercel.app) to see the app in action.
+
 | Dashboard | Browse Shifts | Calendar |
 |-----------|---------------|----------|
-| ![Dashboard](https://via.placeholder.com/400x300/1a1a1a/14b8a6?text=Dashboard) | ![Browse](https://via.placeholder.com/400x300/1a1a1a/14b8a6?text=Browse+Shifts) | ![Calendar](https://via.placeholder.com/400x300/1a1a1a/14b8a6?text=Calendar+View) |
+| ![Dashboard](https://placehold.co/600x400/1a1a1a/14b8a6?text=Dashboard) | ![Browse Shifts](https://placehold.co/600x400/1a1a1a/14b8a6?text=Browse+Shifts) | ![Calendar](https://placehold.co/600x400/1a1a1a/14b8a6?text=Calendar) |
 
 | Post a Shift | Manager Approvals |
 |--------------|-------------------|
-| ![Post](https://via.placeholder.com/400x300/1a1a1a/14b8a6?text=Post+a+Shift) | ![Approvals](https://via.placeholder.com/400x300/1a1a1a/14b8a6?text=Manager+Approvals) |
+| ![Post a Shift](https://placehold.co/600x400/1a1a1a/14b8a6?text=Post+a+Shift) | ![Manager Approvals](https://placehold.co/600x400/1a1a1a/14b8a6?text=Manager+Approvals) |
 
 
 ---
