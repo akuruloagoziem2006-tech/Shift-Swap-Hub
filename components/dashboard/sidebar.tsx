@@ -31,7 +31,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
-import { NotificationsPanel } from './notifications'
+import { NotificationsPanel, MobileNotificationsBell } from './notifications'
 
 // Profile type definition (inline to avoid import issues)
 interface Profile {
@@ -198,12 +198,8 @@ export function DashboardSidebar() {
             <span className="text-lg font-bold text-sidebar-foreground">ShiftSwap</span>
           </div>
           <div className="flex items-center gap-1">
-            {/* Mobile Notifications Bell - links to profile */}
-            <Button variant="ghost" size="icon" asChild>
-              <a href="/dashboard/profile">
-                <Bell className="size-5" />
-              </a>
-            </Button>
+            {/* Mobile Notifications Bell - opens notifications panel */}
+            {userId && <MobileNotificationsBell userId={userId} />}
             {/* Hamburger Menu */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
