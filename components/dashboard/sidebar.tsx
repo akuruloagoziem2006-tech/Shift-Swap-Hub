@@ -197,8 +197,14 @@ export function DashboardSidebar() {
             </div>
             <span className="text-lg font-bold text-sidebar-foreground">ShiftSwap</span>
           </div>
-          <div className="flex items-center gap-2">
-            {userId && <NotificationsPanel userId={userId} />}
+          <div className="flex items-center gap-1">
+            {/* Mobile Notifications Bell - links to profile */}
+            <Button variant="ghost" size="icon" asChild>
+              <a href="/dashboard/profile">
+                <Bell className="size-5" />
+              </a>
+            </Button>
+            {/* Hamburger Menu */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
