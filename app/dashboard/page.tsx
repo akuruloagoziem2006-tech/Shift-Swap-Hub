@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Calendar, Users, Clock, TrendingUp, ArrowRight, PlusCircle, Sparkles, X, User, CalendarOff, Inbox, Share2, CheckCircle, Mail } from 'lucide-react'
+import { Calendar, Users, Clock, TrendingUp, ArrowRight, PlusCircle, Sparkles, X, User, CalendarOff, Inbox, Share2, CheckCircle, Mail, Search } from 'lucide-react'
 import { useToast } from '@/components/ui/use-toast'
 import type { Profile, Shift, ShiftSwapRequest } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
+import { OnboardingGuide } from '@/components/dashboard/onboarding-guide'
 
 export default function Dashboard() {
   const [user, setUser] = useState<Profile | null>(null)
@@ -300,6 +301,9 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Onboarding Guide for New Users */}
+      {currentUserId && <OnboardingGuide userId={currentUserId} />}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card className="bg-card border-border">
@@ -485,26 +489,29 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Button asChild className="bg-emerald-600 hover:bg-emerald-700 h-auto py-4">
-          <Link href="/dashboard/post">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Post a Shift
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="h-auto py-4">
-          <Link href="/dashboard/browse">
-            <Users className="mr-2 h-5 w-5" />
-            Browse Shifts
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="h-auto py-4">
-          <Link href="/dashboard/my-shifts">
-            <Calendar className="mr-2 h-5 w-5" />
-            My Shifts
-          </Link>
-        </Button>
+      {/* Quick Actions - Mobile Friendly */}
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-3 gap-3 md:gap-4">
+          <Button asChild className="bg-emerald-600 hover:bg-emerald-700 h-auto py-4 md:py-5 flex flex-col gap-2 shadow-lg shadow-emerald-500/20">
+            <Link href="/dashboard/post">
+              <PlusCircle className="h-6 w-6 md:h-5 md:w-5" />
+              <span className="text-sm md:text-base font-semibold">Post Shift</span>
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-auto py-4 md:py-5 flex flex-col gap-2 bg-card border-2 hover:border-emerald-500/50">
+            <Link href="/dashboard/browse">
+              <Search className="h-6 w-6 md:h-5 md:w-5 text-emerald-500" />
+              <span className="text-sm md:text-base font-semibold">Browse</span>
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-auto py-4 md:py-5 flex flex-col gap-2 bg-card border-2 hover:border-emerald-500/50">
+            <Link href="/dashboard/my-shifts">
+              <Calendar className="h-6 w-6 md:h-5 md:w-5 text-emerald-500" />
+              <span className="text-sm md:text-base font-semibold">My Shifts</span>
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   )

@@ -26,9 +26,12 @@ import {
   CheckSquare,
   CalendarDays,
   MessageSquare,
+  Bell,
+  Users,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
+import { NotificationsPanel } from './notifications'
 
 // Profile type definition (inline to avoid import issues)
 interface Profile {
@@ -45,11 +48,13 @@ export function DashboardSidebar() {
   const supabase = createClient()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadProfile() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
+        setUserId(user.id)
         const { data } = await supabase
           .from('profiles')
           .select('*')
@@ -76,6 +81,7 @@ export function DashboardSidebar() {
     { name: 'My Shifts', href: '/dashboard/my-shifts', icon: Calendar },
     ...(isManager ? [{ name: 'Approvals', href: '/dashboard/manager', icon: CheckSquare }] : []),
     { name: 'Profile', href: '/dashboard/profile', icon: User },
+    { name: 'Invite Team', href: '/dashboard/profile?tab=invite', icon: Users },
   ]
 
   const NavLinks = ({ onNavigate }: { onNavigate?: () => void }) => (
@@ -102,8 +108,9 @@ export function DashboardSidebar() {
         )
       })}
 
-      {/* Feedback Link */}
-      <div className="pt-4 mt-4 border-t border-border">
+      {/* Notifications & Feedback */}
+      <div className="pt-4 mt-4 border-t border-border space-y-1">
+        {userId && <NotificationsPanel userId={userId} />}
         <a
           href="mailto:akuruloagoziem2006@gmail.com?subject=ShiftSwap Feedback"
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
@@ -141,6 +148,12 @@ export function DashboardSidebar() {
             <Link href="/dashboard/profile">
               <User className="mr-2 size-4" />
               Profile
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/profile?tab=invite">
+              <Users className="mr-2 size-4" />
+              Invite Team
             </Link>
           </DropdownMenuItem>
           {isManager && (
@@ -184,23 +197,26 @@ export function DashboardSidebar() {
             </div>
             <span className="text-lg font-bold text-sidebar-foreground">ShiftSwap</span>
           </div>
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="size-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0 bg-sidebar">
-              <div className="flex items-center gap-2 px-6 py-5 border-b border-sidebar-border">
-                <div className="size-8 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">S</span>
+          <div className="flex items-center gap-2">
+            {userId && <NotificationsPanel userId={userId} />}
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="size-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-0 bg-sidebar">
+                <div className="flex items-center gap-2 px-6 py-5 border-b border-sidebar-border">
+                  <div className="size-8 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">S</span>
+                  </div>
+                  <span className="text-lg font-bold text-sidebar-foreground">ShiftSwap</span>
                 </div>
-                <span className="text-lg font-bold text-sidebar-foreground">ShiftSwap</span>
-              </div>
-              <NavLinks onNavigate={() => setMobileOpen(false)} />
-              <UserSection />
-            </SheetContent>
-          </Sheet>
+                <NavLinks onNavigate={() => setMobileOpen(false)} />
+                <UserSection />
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
     </>
