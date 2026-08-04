@@ -95,7 +95,7 @@ export function DashboardSidebar() {
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
               isActive
-                ? 'bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-500 border-l-2 border-emerald-500'
+                ? 'bg-gradient-to-r blue-500/10 blue-500/10 text-blue-500 border-l-2 border-blue-500'
                 : 'text-muted-foreground hover:bg-secondary/80 hover:text-foreground'
             )}
           >
@@ -120,9 +120,9 @@ export function DashboardSidebar() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2.5 h-auto hover:bg-secondary/80 transition-colors rounded-lg">
-            <Avatar className="size-9 ring-2 ring-emerald-500/20">
+            <Avatar className="size-9 ring-2 ring-blue-500/20">
               <AvatarImage src={profile?.avatar_url || undefined} />
-              <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white font-medium">
+              <AvatarFallback className="bg-gradient-to-br blue-500 blue-500 text-white font-medium">
                 {profile?.full_name?.charAt(0) || profile?.email?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
@@ -177,11 +177,11 @@ export function DashboardSidebar() {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-sidebar border-r border-sidebar-border">
         <div className="flex items-center gap-2.5 px-6 py-4 border-b border-sidebar-border">
-          <div className="size-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <div className="size-9 rounded-xl bg-gradient-to-br blue-500 blue-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
             <span className="text-white font-bold text-sm">S</span>
           </div>
           <span className="text-lg font-bold text-sidebar-foreground">ShiftSwap</span>
-          <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500">v2</span>
+          <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">v2</span>
         </div>
         <NavLinks />
         <UserSection />
@@ -191,7 +191,7 @@ export function DashboardSidebar() {
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-sidebar/95 backdrop-blur-xl border-b border-sidebar-border">
         <div className="flex items-center justify-between px-4 py-3">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <div className="size-8 rounded-lg bg-gradient-to-br blue-500 blue-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
               <span className="text-white font-bold text-sm">S</span>
             </div>
             <span className="text-lg font-bold text-sidebar-foreground">ShiftSwap</span>
@@ -209,7 +209,7 @@ export function DashboardSidebar() {
               </SheetTrigger>
               <SheetContent side="left" className="w-72 p-0 bg-sidebar border-sidebar-border">
                 <div className="flex items-center gap-2.5 px-6 py-4 border-b border-sidebar-border">
-                  <div className="size-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                  <div className="size-9 rounded-xl bg-gradient-to-br blue-500 blue-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
                     <span className="text-white font-bold text-sm">S</span>
                   </div>
                   <span className="text-lg font-bold text-sidebar-foreground">ShiftSwap</span>

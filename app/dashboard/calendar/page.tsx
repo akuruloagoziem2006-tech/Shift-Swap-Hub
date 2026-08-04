@@ -134,9 +134,9 @@ export default function CalendarPage() {
     switch (status) {
       case 'open':
         return { 
-          bg: 'bg-gradient-to-br from-emerald-500/20 to-emerald-700/20', 
-          border: 'border-emerald-500/40',
-          text: 'text-emerald-400',
+          bg: 'bg-gradient-to-br blue-500/20 blue-700/20', 
+          border: 'border-blue-500/40',
+          text: 'text-blue-400',
           icon: <ArrowRightLeft className="w-3 h-3" />
         }
       case 'scheduled':
@@ -266,11 +266,11 @@ export default function CalendarPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 border-emerald-500/20">
+        <Card className="bg-gradient-to-br blue-500/5 blue-500/10 border-blue-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <ArrowRightLeft className="w-5 h-5 text-emerald-500" />
+              <div className="p-2 rounded-lg bg-blue-500/10">
+                <ArrowRightLeft className="w-5 h-5 text-blue-500" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{openShifts}</p>
@@ -353,8 +353,8 @@ export default function CalendarPage() {
                   hasOpenShifts: (date) => hasOpenShifts(date),
                 }}
                 modifiersClassNames={{
-                  hasShifts: 'bg-emerald-500/10 hover:bg-emerald-500/20',
-                  hasOpenShifts: 'bg-emerald-500/20 border-2 border-emerald-500/50 font-semibold',
+                  hasShifts: 'bg-blue-500/10 hover:bg-blue-500/20',
+                  hasOpenShifts: 'bg-blue-500/20 border-2 border-blue-500/50 font-semibold',
                 }}
                 components={{
                   DayButton: ({ day, modifiers, ...props }) => {
@@ -379,7 +379,7 @@ export default function CalendarPage() {
                             <div className="flex gap-0.5 mt-1">
                               <span className={cn(
                                 "w-1.5 h-1.5 rounded-full",
-                                openCount > 0 ? "bg-emerald-500" : "bg-amber-500"
+                                openCount > 0 ? "bg-blue-500" : "bg-amber-500"
                               )} />
                               {openCount > 0 && openCount < shiftCount && (
                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500/70" />
@@ -397,11 +397,11 @@ export default function CalendarPage() {
 
               <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span className="w-3 h-3 rounded-full bg-blue-500" />
                   <span>Has shifts</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-emerald-500/50" />
+                  <span className="w-3 h-3 rounded-full bg-blue-500 ring-2 ring-blue-500/50" />
                   <span>Open for swap</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -488,7 +488,7 @@ export default function CalendarPage() {
                       {!isOwn && (shift.status === 'open' || shift.status === 'scheduled') && (
                         <Button 
                           size="sm" 
-                          className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 gap-2"
+                          className="w-full mt-4 bg-blue-600 hover:bg-blue-700 gap-2"
                           onClick={(e) => {
                             e.stopPropagation()
                             setSelectedShift(shift)
@@ -586,7 +586,7 @@ export default function CalendarPage() {
             <Button 
               onClick={handleRequestSwap}
               disabled={submitting}
-              className="bg-emerald-600 hover:bg-emerald-700 gap-2"
+              className="bg-blue-600 hover:bg-blue-700 gap-2"
             >
               {submitting ? 'Sending...' : (
                 <>

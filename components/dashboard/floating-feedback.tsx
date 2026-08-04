@@ -52,7 +52,7 @@ export function FloatingFeedbackButton() {
         <SheetTrigger asChild>
           <Button
             size="lg"
-            className="rounded-full h-14 w-14 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-xl shadow-emerald-500/25 p-0 group"
+            className="rounded-full h-14 w-14 bg-gradient-to-r blue-500 blue-500 hover:from-blue-600 hover:to-blue-600 shadow-xl shadow-blue-500/25 p-0 group"
           >
             <MessageSquare className="h-6 w-6 group-hover:scale-110 transition-transform" />
             <span className="sr-only">Send Feedback</span>
@@ -61,7 +61,7 @@ export function FloatingFeedbackButton() {
         <SheetContent className="bg-card border-border w-full sm:max-w-md">
           <SheetHeader>
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+              <div className="size-10 rounded-xl bg-gradient-to-br blue-500 blue-500 flex items-center justify-center">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
               <SheetTitle className="text-lg">Share Your Feedback</SheetTitle>
@@ -98,7 +98,7 @@ export function FloatingFeedbackButton() {
             <Button 
               onClick={handleSendFeedback} 
               disabled={sending}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-medium"
+              className="w-full bg-gradient-to-r blue-500 blue-500 hover:from-blue-600 hover:to-blue-600 font-medium"
             >
               <Mail className="mr-2 h-4 w-4" />
               {sending ? 'Opening email...' : 'Send Feedback'}
@@ -108,7 +108,7 @@ export function FloatingFeedbackButton() {
               Or email us directly at{' '}
               <a 
                 href="mailto:akuruloagoziem2006@gmail.com" 
-                className="text-emerald-500 hover:text-emerald-400 font-medium"
+                className="text-blue-500 hover:text-blue-400 font-medium"
               >
                 akuruloagoziem2006@gmail.com
               </a>

@@ -12,7 +12,7 @@ export default function TermsPage() {
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="size-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <div className="size-10 rounded-xl bg-gradient-to-br blue-500 blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <span className="text-white font-bold text-lg">S</span>
               </div>
               <span className="text-xl font-bold">ShiftSwap</span>
@@ -113,7 +113,7 @@ export default function TermsPage() {
             <h2 className="text-xl font-semibold text-foreground">10. Contact</h2>
             <p>
               For questions about these Terms of Service, please contact us at{' '}
-              <a href="mailto:akuruloagoziem2006@gmail.com" className="text-emerald-500 hover:text-emerald-400">
+              <a href="mailto:akuruloagoziem2006@gmail.com" className="text-blue-500 hover:text-blue-400">
                 akuruloagoziem2006@gmail.com
               </a>
             </p>

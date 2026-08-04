@@ -156,7 +156,7 @@ export default function ManagerApprovals() {
     <div className="max-w-5xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-          <Shield className="w-8 h-8 text-emerald-500" />
+          <Shield className="w-8 h-8 text-blue-500" />
           Manager Dashboard
         </h1>
         <p className="text-muted-foreground">
@@ -220,17 +220,17 @@ export default function ManagerApprovals() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-secondary/50 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-emerald-500" />
+                        <Calendar className="w-5 h-5 text-blue-500" />
                         <span className="text-sm">{request.shift?.date ? formatDate(request.shift.date, 'EEE, MMM d') : 'N/A'}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <Clock className="w-5 h-5 text-emerald-500" />
+                        <Clock className="w-5 h-5 text-blue-500" />
                         <span className="text-sm">
                           {request.shift?.start_time ? formatTime(request.shift.start_time) : ''} - {request.shift?.end_time ? formatTime(request.shift.end_time) : ''}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <MapPin className="w-5 h-5 text-emerald-500" />
+                        <MapPin className="w-5 h-5 text-blue-500" />
                         <span className="text-sm">{request.shift?.location || 'No location'}</span>
                       </div>
                     </div>
@@ -249,9 +249,9 @@ export default function ManagerApprovals() {
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 p-3 bg-emerald-500/10 rounded-lg">
+                      <div className="flex items-center gap-3 p-3 bg-blue-500/10 rounded-lg">
                         <Avatar className="size-10">
-                          <AvatarFallback className="bg-emerald-500/20 text-emerald-500 text-sm">
+                          <AvatarFallback className="bg-blue-500/20 text-blue-500 text-sm">
                             {request.requester?.full_name?.charAt(0) || 'U'}
                           </AvatarFallback>
                         </Avatar>
@@ -291,7 +291,7 @@ export default function ManagerApprovals() {
                             size="sm"
                             onClick={() => handleApprove(request)}
                             disabled={processingId === request.id}
-                            className="gap-1 bg-emerald-600 hover:bg-emerald-700"
+                            className="gap-1 bg-blue-600 hover:bg-blue-700"
                           >
                             <CheckCircle2 className="w-4 h-4" />
                             {processingId === request.id ? 'Approving...' : 'Approve'}
@@ -310,8 +310,8 @@ export default function ManagerApprovals() {
           ) : (
             <Card className="bg-card border-border">
               <CardContent className="p-12 text-center">
-                <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
-                  <CheckCircle2 className="w-12 h-12 text-emerald-500" />
+                <div className="inline-flex p-4 bg-blue-500/10 rounded-full mb-4">
+                  <CheckCircle2 className="w-12 h-12 text-blue-500" />
                 </div>
                 <p className="text-xl font-semibold mb-2">All caught up! 🎉</p>
                 <p className="text-muted-foreground max-w-md mx-auto">
@@ -364,8 +364,8 @@ export default function ManagerApprovals() {
           ) : (
             <Card className="bg-card border-border">
               <CardContent className="p-12 text-center">
-                <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
-                  <Users className="w-12 h-12 text-emerald-500" />
+                <div className="inline-flex p-4 bg-blue-500/10 rounded-full mb-4">
+                  <Users className="w-12 h-12 text-blue-500" />
                 </div>
                 <p className="text-xl font-semibold mb-2">No team members yet</p>
                 <p className="text-muted-foreground max-w-md mx-auto">

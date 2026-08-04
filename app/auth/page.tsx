@@ -158,14 +158,14 @@ function AuthPageContent() {
       {/* Left Panel - Decorative (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/40 via-background to-background" />
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-emerald-500/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-emerald-600/10 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br blue-900/40 via-background to-background" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-3xl" />
         
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20">
           <Link href="/" className="flex items-center gap-3 mb-12">
-            <div className="size-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <div className="size-12 rounded-xl bg-gradient-to-br blue-500 blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
               <span className="text-white font-bold text-xl">S</span>
             </div>
             <span className="text-2xl font-bold">ShiftSwap</span>
@@ -173,7 +173,7 @@ function AuthPageContent() {
           
           <h1 className="text-4xl xl:text-5xl font-bold mb-6 leading-tight">
             Shift management,{' '}
-            <span className="bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r blue-400 blue-500 bg-clip-text text-transparent">
               simplified
             </span>
           </h1>
@@ -190,8 +190,8 @@ function AuthPageContent() {
               { icon: Shield, text: 'Manager approvals keep your team covered' },
             ].map((feature, i) => (
               <div key={i} className="flex items-start gap-4">
-                <div className="size-10 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                  <feature.icon className="size-5 text-emerald-500" />
+                <div className="size-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                  <feature.icon className="size-5 text-blue-500" />
                 </div>
                 <p className="text-sm text-muted-foreground pt-1.5">{feature.text}</p>
               </div>
@@ -203,7 +203,7 @@ function AuthPageContent() {
             <div className="flex items-center gap-4">
               <div className="flex -space-x-2">
                 {['MK', 'JT', 'SL', 'AR'].map((initials, i) => (
-                  <div key={i} className="size-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 border-2 border-background flex items-center justify-center text-xs font-medium text-white">
+                  <div key={i} className="size-9 rounded-full bg-gradient-to-br blue-400 blue-600 border-2 border-background flex items-center justify-center text-xs font-medium text-white">
                     {initials}
                   </div>
                 ))}
@@ -229,7 +229,7 @@ function AuthPageContent() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              <div className="size-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+              <div className="size-10 rounded-xl bg-gradient-to-br blue-500 blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
                 <span className="text-white font-bold text-lg">S</span>
               </div>
               <span className="text-2xl font-bold">ShiftSwap</span>
@@ -258,9 +258,9 @@ function AuthPageContent() {
           )}
 
           {successMessage && (
-            <Alert className="mb-6 bg-emerald-500/10 border-emerald-500/20">
-              <AlertCircle className="h-4 w-4 text-emerald-500" />
-              <AlertDescription className="text-emerald-500">{successMessage}</AlertDescription>
+            <Alert className="mb-6 bg-blue-500/10 border-blue-500/20">
+              <AlertCircle className="h-4 w-4 text-blue-500" />
+              <AlertDescription className="text-blue-500">{successMessage}</AlertDescription>
             </Alert>
           )}
 
@@ -305,13 +305,13 @@ function AuthPageContent() {
           </div>
 
           {/* Try Demo Button - Prominent Hero Style */}
-          <div className="relative mb-6 p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/20">
+          <div className="relative mb-6 p-4 rounded-xl bg-gradient-to-br blue-500/10 blue-500/5 to-transparent border border-blue-500/20">
             <Button
               type="button"
               size="lg"
               onClick={handleDemoLogin}
               disabled={demoLoading}
-              className="w-full h-14 bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 hover:from-emerald-400 hover:via-emerald-500 hover:to-emerald-600 shadow-xl shadow-emerald-500/30 font-bold text-lg transition-all duration-300 hover:scale-[1.02]"
+              className="w-full h-14 bg-gradient-to-r blue-500 blue-600 blue-700 hover:blue-400 hover:blue-500 hover:blue-600 shadow-xl shadow-blue-500/30 font-bold text-lg transition-all duration-300 hover:scale-[1.02]"
             >
               {demoLoading ? (
                 <>
@@ -325,7 +325,7 @@ function AuthPageContent() {
                 </>
               )}
             </Button>
-            <p className="text-sm text-emerald-400/80 text-center mt-3">
+            <p className="text-sm text-blue-400/80 text-center mt-3">
               No signup needed • Explore with sample data instantly
             </p>
           </div>
@@ -365,7 +365,7 @@ function AuthPageContent() {
                   <button
                     type="button"
                     onClick={() => { setMode('reset'); setError(null); setSuccessMessage(null); }}
-                    className="text-sm text-emerald-500 hover:text-emerald-400 font-medium"
+                    className="text-sm text-blue-500 hover:text-blue-400 font-medium"
                   >
                     Forgot password?
                   </button>
@@ -384,7 +384,7 @@ function AuthPageContent() {
                 </div>
               </div>
 
-              <Button type="submit" disabled={loading} size="lg" className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/25 font-semibold">
+              <Button type="submit" disabled={loading} size="lg" className="w-full h-12 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 font-semibold">
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -409,7 +409,7 @@ function AuthPageContent() {
                 <button
                   type="button"
                   onClick={() => { setMode('signin'); setError(null); }}
-                  className="text-sm text-emerald-500 hover:text-emerald-400 font-medium"
+                  className="text-sm text-blue-500 hover:text-blue-400 font-medium"
                 >
                   Try the demo →
                 </button>
@@ -465,7 +465,7 @@ function AuthPageContent() {
                 <p className="text-xs text-muted-foreground">Must be at least 8 characters</p>
               </div>
 
-              <Button type="submit" disabled={loading} size="lg" className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/25 font-semibold">
+              <Button type="submit" disabled={loading} size="lg" className="w-full h-12 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 font-semibold">
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -481,9 +481,9 @@ function AuthPageContent() {
 
               <p className="text-xs text-muted-foreground text-center">
                 By creating an account, you agree to our{' '}
-                <Link href="/" className="text-emerald-500 hover:text-emerald-400">Terms of Service</Link>
+                <Link href="/" className="text-blue-500 hover:text-blue-400">Terms of Service</Link>
                 {' '}and{' '}
-                <Link href="/" className="text-emerald-500 hover:text-emerald-400">Privacy Policy</Link>.
+                <Link href="/" className="text-blue-500 hover:text-blue-400">Privacy Policy</Link>.
               </p>
             </form>
           )}
@@ -507,7 +507,7 @@ function AuthPageContent() {
                 </div>
               </div>
 
-              <Button type="submit" disabled={loading} size="lg" className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/25 font-semibold">
+              <Button type="submit" disabled={loading} size="lg" className="w-full h-12 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 font-semibold">
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -526,7 +526,7 @@ function AuthPageContent() {
                 <button
                   type="button"
                   onClick={() => { setMode('signin'); setError(null); setSuccessMessage(null); }}
-                  className="text-emerald-500 hover:text-emerald-400 font-medium"
+                  className="text-blue-500 hover:text-blue-400 font-medium"
                 >
                   Sign in
                 </button>
@@ -542,7 +542,7 @@ function AuthPageContent() {
                 <button
                   type="button"
                   onClick={() => { setMode('signup'); setError(null); setSuccessMessage(null); }}
-                  className="text-emerald-500 hover:text-emerald-400 font-semibold"
+                  className="text-blue-500 hover:text-blue-400 font-semibold"
                 >
                   Sign up free
                 </button>
@@ -554,7 +554,7 @@ function AuthPageContent() {
                 <button
                   type="button"
                   onClick={() => { setMode('signin'); setError(null); setSuccessMessage(null); }}
-                  className="text-emerald-500 hover:text-emerald-400 font-semibold"
+                  className="text-blue-500 hover:text-blue-400 font-semibold"
                 >
                   Sign in
                 </button>
@@ -576,7 +576,7 @@ export default function AuthPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex items-center gap-2">
-          <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
+          <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
           <span className="text-muted-foreground">Loading...</span>
         </div>
       </div>

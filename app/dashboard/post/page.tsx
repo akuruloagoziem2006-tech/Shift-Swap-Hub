@@ -163,7 +163,7 @@ export default function PostShift() {
               <Button type="button" variant="outline" onClick={() => router.back()} className="flex-1">
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading} className="flex-1 bg-emerald-600 hover:bg-emerald-700">
+              <Button type="submit" disabled={loading} className="flex-1 bg-blue-600 hover:bg-blue-700">
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />

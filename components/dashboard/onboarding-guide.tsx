@@ -83,9 +83,9 @@ export function OnboardingGuide({ userId, onComplete }: OnboardingGuideProps) {
   return (
     <Dialog open={showGuide} onOpenChange={setShowGuide}>
       <DialogContent className="sm:max-w-lg bg-card border-border/50 p-0 overflow-hidden">
-        <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent p-6 pb-0">
+        <div className="bg-gradient-to-br blue-500/10 via-blue-500/5 to-transparent p-6 pb-0">
           <DialogHeader className="text-center">
-            <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl w-fit shadow-lg shadow-emerald-500/25">
+            <div className="mx-auto mb-4 p-4 bg-gradient-to-br blue-500 blue-500 rounded-2xl w-fit shadow-lg shadow-blue-500/25">
               <Rocket className="h-10 w-10 text-white" />
             </div>
             <DialogTitle className="text-2xl font-bold">Welcome to ShiftSwap v2! 🚀</DialogTitle>
@@ -103,9 +103,9 @@ export function OnboardingGuide({ userId, onComplete }: OnboardingGuideProps) {
                 <div 
                   className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
                     index === currentStep 
-                      ? 'bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 scale-110' 
+                      ? 'bg-gradient-to-br blue-500 blue-500 text-white shadow-lg shadow-blue-500/25 scale-110' 
                       : index < currentStep 
-                        ? 'bg-emerald-500/20 text-emerald-500' 
+                        ? 'bg-blue-500/20 text-blue-500' 
                         : 'bg-secondary text-muted-foreground'
                   }`}
                 >
@@ -114,7 +114,7 @@ export function OnboardingGuide({ userId, onComplete }: OnboardingGuideProps) {
                 {index < steps.length - 1 && (
                   <div 
                     className={`w-16 h-1 mx-1 rounded-full transition-colors duration-300 ${
-                      index < currentStep ? 'bg-gradient-to-r from-emerald-500 to-teal-500' : 'bg-secondary'
+                      index < currentStep ? 'bg-gradient-to-r blue-500 blue-500' : 'bg-secondary'
                     }`}
                   />
                 )}
@@ -125,10 +125,10 @@ export function OnboardingGuide({ userId, onComplete }: OnboardingGuideProps) {
           {/* Current Step Card */}
           <Card className="bg-gradient-to-br from-secondary/50 to-secondary/20 border-border/50">
             <CardContent className="p-6 text-center">
-              <div className="mx-auto mb-4 p-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-2xl w-fit">
+              <div className="mx-auto mb-4 p-4 bg-gradient-to-br blue-500/10 blue-500/10 rounded-2xl w-fit">
                 {(() => {
                   const Icon = steps[currentStep].icon
-                  return <Icon className="h-10 w-10 text-emerald-500" />
+                  return <Icon className="h-10 w-10 text-blue-500" />
                 })()}
               </div>
               <h3 className="text-xl font-semibold mb-2">
@@ -137,7 +137,7 @@ export function OnboardingGuide({ userId, onComplete }: OnboardingGuideProps) {
               <p className="text-muted-foreground mb-6">
                 {steps[currentStep].description}
               </p>
-              <Button asChild className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-medium shadow-lg shadow-emerald-500/20">
+              <Button asChild className="bg-gradient-to-r blue-500 blue-500 hover:from-blue-600 hover:to-blue-600 font-medium shadow-lg shadow-blue-500/20">
                 <Link href={steps[currentStep].href}>
                   {steps[currentStep].cta}
                   <ArrowRight className="ml-2 h-4 w-4" />

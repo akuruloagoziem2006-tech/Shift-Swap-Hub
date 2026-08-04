@@ -97,7 +97,7 @@ export function NotificationsPanel({ userId }: NotificationsProps) {
       case 'swap_request':
         return <ArrowLeftRight className="h-5 w-5 text-amber-500" />
       case 'swap_approved':
-        return <CheckCircle className="h-5 w-5 text-emerald-500" />
+        return <CheckCircle className="h-5 w-5 text-blue-500" />
       case 'swap_rejected':
         return <XCircle className="h-5 w-5 text-red-500" />
     }
@@ -157,14 +157,14 @@ export function NotificationsPanel({ userId }: NotificationsProps) {
               <Card 
                 key={notification.id} 
                 className={`transition-colors ${
-                  !notification.read ? 'border-emerald-500/30 bg-emerald-500/5' : ''
+                  !notification.read ? 'border-blue-500/30 bg-blue-500/5' : ''
                 }`}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${
                       notification.type === 'swap_request' ? 'bg-amber-500/10' :
-                      notification.type === 'swap_approved' ? 'bg-emerald-500/10' :
+                      notification.type === 'swap_approved' ? 'bg-blue-500/10' :
                       'bg-red-500/10'
                     }`}>
                       {getNotificationIcon(notification.type)}
@@ -196,7 +196,7 @@ export function NotificationsPanel({ userId }: NotificationsProps) {
                             router.push('/dashboard/my-shifts')
                             setOpen(false)
                           }}
-                          className="text-emerald-500 hover:text-emerald-400"
+                          className="text-blue-500 hover:text-blue-400"
                         >
                           View Details
                         </Button>
@@ -285,7 +285,7 @@ export function MobileNotificationsBell({ userId }: NotificationsProps) {
       case 'swap_request':
         return <ArrowLeftRight className="h-5 w-5 text-amber-500" />
       case 'swap_approved':
-        return <CheckCircle className="h-5 w-5 text-emerald-500" />
+        return <CheckCircle className="h-5 w-5 text-blue-500" />
       case 'swap_rejected':
         return <XCircle className="h-5 w-5 text-red-500" />
     }
@@ -344,14 +344,14 @@ export function MobileNotificationsBell({ userId }: NotificationsProps) {
               <Card 
                 key={notification.id} 
                 className={`transition-colors ${
-                  !notification.read ? 'border-emerald-500/30 bg-emerald-500/5' : ''
+                  !notification.read ? 'border-blue-500/30 bg-blue-500/5' : ''
                 }`}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${
                       notification.type === 'swap_request' ? 'bg-amber-500/10' :
-                      notification.type === 'swap_approved' ? 'bg-emerald-500/10' :
+                      notification.type === 'swap_approved' ? 'bg-blue-500/10' :
                       'bg-red-500/10'
                     }`}>
                       {getNotificationIcon(notification.type)}
@@ -383,7 +383,7 @@ export function MobileNotificationsBell({ userId }: NotificationsProps) {
                             router.push('/dashboard/my-shifts')
                             setOpen(false)
                           }}
-                          className="text-emerald-500 hover:text-emerald-400"
+                          className="text-blue-500 hover:text-blue-400"
                         >
                           View Details
                         </Button>

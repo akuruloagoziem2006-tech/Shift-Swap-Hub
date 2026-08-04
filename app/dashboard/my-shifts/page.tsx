@@ -156,7 +156,7 @@ export default function MyShifts() {
       toast({
         title: 'Shift deleted',
         description: 'The shift has been permanently removed.',
-        className: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500',
+        className: 'bg-blue-500/10 border-blue-500/20 text-blue-500',
       })
 
       setShifts(shifts => shifts.filter(s => s.id !== shiftToDelete.id))
@@ -179,7 +179,7 @@ export default function MyShifts() {
       case 'scheduled':
         return <Badge variant="secondary">Scheduled</Badge>
       case 'open':
-        return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Open for Swap</Badge>
+        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Open for Swap</Badge>
       case 'filled':
         return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Filled</Badge>
       case 'completed':
@@ -196,7 +196,7 @@ export default function MyShifts() {
       case 'pending':
         return <Badge variant="secondary">Pending</Badge>
       case 'approved':
-        return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Approved</Badge>
+        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Approved</Badge>
       case 'rejected':
         return <Badge variant="destructive">Rejected</Badge>
       case 'cancelled':
@@ -226,7 +226,7 @@ export default function MyShifts() {
           <h1 className="text-3xl font-bold mb-1">My Shifts</h1>
           <p className="text-muted-foreground">Manage your shifts and track swap requests</p>
         </div>
-        <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+        <Button asChild className="bg-blue-600 hover:bg-blue-700">
           <Link href="/dashboard/post">
             <PlusCircle className="mr-2 h-4 w-4" />
             Post New Shift
@@ -243,12 +243,12 @@ export default function MyShifts() {
         {shifts.length > 0 ? (
           <div className="space-y-4">
             {shifts.map((shift) => (
-              <Card key={shift.id} className="bg-card border-border hover:border-emerald-500/30 transition-colors">
+              <Card key={shift.id} className="bg-card border-border hover:border-blue-500/30 transition-colors">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 bg-emerald-500/10 rounded-lg">
-                        <Calendar className="w-5 h-5 text-emerald-500" />
+                      <div className="p-2 bg-blue-500/10 rounded-lg">
+                        <Calendar className="w-5 h-5 text-blue-500" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">{shift.position}</CardTitle>
@@ -279,7 +279,7 @@ export default function MyShifts() {
                         size="sm" 
                         variant="outline"
                         onClick={() => handleMakeOpen(shift.id)}
-                        className="text-emerald-500 hover:text-emerald-400"
+                        className="text-blue-500 hover:text-blue-400"
                       >
                         <ArrowRightLeft className="mr-2 h-4 w-4" />
                         Make Available for Swap
@@ -305,14 +305,14 @@ export default function MyShifts() {
         ) : (
           <Card className="bg-card border-border">
             <CardContent className="p-12 text-center">
-              <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
-                <CalendarOff className="w-12 h-12 text-emerald-500" />
+              <div className="inline-flex p-4 bg-blue-500/10 rounded-full mb-4">
+                <CalendarOff className="w-12 h-12 text-blue-500" />
               </div>
               <p className="text-xl font-semibold mb-2">No shifts yet</p>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 You haven't posted any shifts for swap. Post your first shift and let colleagues know you're available!
               </p>
-              <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+              <Button asChild className="bg-blue-600 hover:bg-blue-700">
                 <Link href="/dashboard/post">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Post Your First Shift
@@ -394,14 +394,14 @@ export default function MyShifts() {
         ) : (
           <Card className="bg-card border-border">
             <CardContent className="p-12 text-center">
-              <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
-                <ArrowRightLeft className="w-12 h-12 text-emerald-500" />
+              <div className="inline-flex p-4 bg-blue-500/10 rounded-full mb-4">
+                <ArrowRightLeft className="w-12 h-12 text-blue-500" />
               </div>
               <p className="text-xl font-semibold mb-2">No swap requests yet</p>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 You haven't requested any shifts. Browse available shifts and request coverage from your colleagues!
               </p>
-              <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+              <Button asChild className="bg-blue-600 hover:bg-blue-700">
                 <Link href="/dashboard/browse">
                   <Search className="mr-2 h-4 w-4" />
                   Browse Available Shifts

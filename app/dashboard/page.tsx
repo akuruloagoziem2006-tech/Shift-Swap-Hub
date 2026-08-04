@@ -171,7 +171,7 @@ export default function Dashboard() {
   const getStatusBadge = (status: Shift['status']) => {
     switch (status) {
       case 'open':
-        return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Open</Badge>
+        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Open</Badge>
       case 'filled':
         return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Filled</Badge>
       case 'scheduled':
@@ -224,15 +224,15 @@ export default function Dashboard() {
       </div>
 
       {/* How It Works */}
-      <div className="mb-8 bg-gradient-to-br from-emerald-500/5 via-emerald-500/10 to-transparent border border-emerald-500/20 rounded-xl p-6">
+      <div className="mb-8 bg-gradient-to-br blue-500/5 blue-500/10 to-transparent border border-blue-500/20 rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-emerald-500" />
+          <Sparkles className="h-5 w-5 text-blue-500" />
           How ShiftSwap Works
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-emerald-500/10 rounded-lg h-fit">
-              <Share2 className="h-5 w-5 text-emerald-500" />
+            <div className="p-2 bg-blue-500/10 rounded-lg h-fit">
+              <Share2 className="h-5 w-5 text-blue-500" />
             </div>
             <div>
               <h3 className="font-medium mb-1">1. Post Your Shift</h3>
@@ -240,8 +240,8 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-emerald-500/10 rounded-lg h-fit">
-              <Users className="h-5 w-5 text-emerald-500" />
+            <div className="p-2 bg-blue-500/10 rounded-lg h-fit">
+              <Users className="h-5 w-5 text-blue-500" />
             </div>
             <div>
               <h3 className="font-medium mb-1">2. Request a Swap</h3>
@@ -249,8 +249,8 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-emerald-500/10 rounded-lg h-fit">
-              <CheckCircle className="h-5 w-5 text-emerald-500" />
+            <div className="p-2 bg-blue-500/10 rounded-lg h-fit">
+              <CheckCircle className="h-5 w-5 text-blue-500" />
             </div>
             <div>
               <h3 className="font-medium mb-1">3. Get Approved</h3>
@@ -262,11 +262,11 @@ export default function Dashboard() {
 
       {/* Welcome Banner for First-Time Users */}
       {showWelcome && (
-        <div className="mb-8 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-xl p-6">
+        <div className="mb-8 bg-gradient-to-r blue-500/10 blue-500/10 border border-blue-500/20 rounded-xl p-6">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-emerald-500/20 rounded-lg">
-                <Sparkles className="h-6 w-6 text-emerald-500" />
+              <div className="p-3 bg-blue-500/20 rounded-lg">
+                <Sparkles className="h-6 w-6 text-blue-500" />
               </div>
               <div>
                 <h2 className="text-xl font-bold mb-1">
@@ -276,7 +276,7 @@ export default function Dashboard() {
                   Get started by setting up your profile and posting your first shift.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
                     <Link href="/dashboard/profile">
                       <Sparkles className="mr-2 h-4 w-4" />
                       Complete Profile
@@ -309,7 +309,7 @@ export default function Dashboard() {
         <Card className="bg-card border-border">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Open Shifts</CardTitle>
-            <Users className="h-4 w-4 text-emerald-500" />
+            <Users className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl md:text-3xl font-bold">{openShifts.length}</div>
@@ -320,7 +320,7 @@ export default function Dashboard() {
         <Card className="bg-card border-border">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">My Shifts</CardTitle>
-            <Calendar className="h-4 w-4 text-emerald-500" />
+            <Calendar className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl md:text-3xl font-bold">{myShifts.length}</div>
@@ -342,7 +342,7 @@ export default function Dashboard() {
         <Card className="bg-card border-border">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">My Requests</CardTitle>
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
+            <TrendingUp className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl md:text-3xl font-bold">-</div>
@@ -365,7 +365,7 @@ export default function Dashboard() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-start gap-3">
                       <Avatar className="size-10">
-                        <AvatarFallback className="bg-emerald-500/10 text-emerald-500 text-sm">
+                        <AvatarFallback className="bg-blue-500/10 text-blue-500 text-sm">
                           {request.requester?.full_name?.charAt(0) || 'U'}
                         </AvatarFallback>
                       </Avatar>
@@ -392,7 +392,7 @@ export default function Dashboard() {
                       </Button>
                       <Button 
                         size="sm" 
-                        className="bg-emerald-600 hover:bg-emerald-700"
+                        className="bg-blue-600 hover:bg-blue-700"
                         onClick={() => handleApproveRequest(request)}
                       >
                         Approve
@@ -419,7 +419,7 @@ export default function Dashboard() {
         {openShifts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {openShifts.map((shift) => (
-              <Card key={shift.id} className="bg-card border-border hover:border-emerald-500/30 transition-colors">
+              <Card key={shift.id} className="bg-card border-border hover:border-blue-500/30 transition-colors">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     {getStatusBadge(shift.status)}
@@ -451,7 +451,7 @@ export default function Dashboard() {
                       Your Shift
                     </Button>
                   ) : (
-                    <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700" asChild>
+                    <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700" asChild>
                       <Link href="/dashboard/browse">
                         Request Swap
                       </Link>
@@ -464,15 +464,15 @@ export default function Dashboard() {
         ) : (
           <Card className="bg-card border-border">
             <CardContent className="p-12 text-center">
-              <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
-                <CalendarOff className="w-12 h-12 text-emerald-500" />
+              <div className="inline-flex p-4 bg-blue-500/10 rounded-full mb-4">
+                <CalendarOff className="w-12 h-12 text-blue-500" />
               </div>
               <p className="text-xl font-semibold mb-2">No open shifts available</p>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 When colleagues post shifts for swap, they'll appear here. Be the first to post!
               </p>
               <div className="flex flex-wrap justify-center gap-3">
-                <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+                <Button asChild className="bg-blue-600 hover:bg-blue-700">
                   <Link href="/dashboard/post">
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Post a Shift
@@ -493,21 +493,21 @@ export default function Dashboard() {
       <div className="mb-8">
         <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
         <div className="grid grid-cols-3 gap-3 md:gap-4">
-          <Button asChild className="bg-emerald-600 hover:bg-emerald-700 h-auto py-4 md:py-5 flex flex-col gap-2 shadow-lg shadow-emerald-500/20">
+          <Button asChild className="bg-blue-600 hover:bg-blue-700 h-auto py-4 md:py-5 flex flex-col gap-2 shadow-lg shadow-blue-500/20">
             <Link href="/dashboard/post">
               <PlusCircle className="h-6 w-6 md:h-5 md:w-5" />
               <span className="text-sm md:text-base font-semibold">Post Shift</span>
             </Link>
           </Button>
-          <Button asChild variant="outline" className="h-auto py-4 md:py-5 flex flex-col gap-2 bg-card border-2 hover:border-emerald-500/50">
+          <Button asChild variant="outline" className="h-auto py-4 md:py-5 flex flex-col gap-2 bg-card border-2 hover:border-blue-500/50">
             <Link href="/dashboard/browse">
-              <Search className="h-6 w-6 md:h-5 md:w-5 text-emerald-500" />
+              <Search className="h-6 w-6 md:h-5 md:w-5 text-blue-500" />
               <span className="text-sm md:text-base font-semibold">Browse</span>
             </Link>
           </Button>
-          <Button asChild variant="outline" className="h-auto py-4 md:py-5 flex flex-col gap-2 bg-card border-2 hover:border-emerald-500/50">
+          <Button asChild variant="outline" className="h-auto py-4 md:py-5 flex flex-col gap-2 bg-card border-2 hover:border-blue-500/50">
             <Link href="/dashboard/my-shifts">
-              <Calendar className="h-6 w-6 md:h-5 md:w-5 text-emerald-500" />
+              <Calendar className="h-6 w-6 md:h-5 md:w-5 text-blue-500" />
               <span className="text-sm md:text-base font-semibold">My Shifts</span>
             </Link>
           </Button>

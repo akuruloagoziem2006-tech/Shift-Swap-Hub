@@ -151,7 +151,7 @@ export default function BrowseShifts() {
       toast({
         title: 'Shift deleted',
         description: 'The shift has been permanently removed.',
-        className: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500',
+        className: 'bg-blue-500/10 border-blue-500/20 text-blue-500',
       })
 
       setShifts(shifts => shifts.filter(s => s.id !== shiftToDelete.id))
@@ -244,12 +244,12 @@ export default function BrowseShifts() {
             </Button>
           </div>
           {filteredShifts.map((shift) => (
-            <Card key={shift.id} className="bg-card border-border hover:border-emerald-500/30 transition-colors">
+            <Card key={shift.id} className="bg-card border-border hover:border-blue-500/30 transition-colors">
               <CardContent className="p-4 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex-1 space-y-3">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
+                      <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
                         {shift.status}
                       </Badge>
                       <Badge variant="secondary">{shift.department}</Badge>
@@ -304,7 +304,7 @@ export default function BrowseShifts() {
                       </div>
                     ) : (
                       <Button 
-                        className="bg-emerald-600 hover:bg-emerald-700 w-full md:w-auto"
+                        className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto"
                         onClick={() => handleRequestSwap(shift)}
                         disabled={requestingShift === shift.id}
                       >
@@ -330,8 +330,8 @@ export default function BrowseShifts() {
       ) : (
         <Card className="bg-card border-border">
           <CardContent className="p-12 text-center">
-            <div className="inline-flex p-4 bg-emerald-500/10 rounded-full mb-4">
-              <CalendarOff className="w-12 h-12 text-emerald-500" />
+            <div className="inline-flex p-4 bg-blue-500/10 rounded-full mb-4">
+              <CalendarOff className="w-12 h-12 text-blue-500" />
             </div>
             <p className="text-xl font-semibold mb-2">No shifts available</p>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
@@ -352,7 +352,7 @@ export default function BrowseShifts() {
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
               </Button>
-              <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+              <Button asChild className="bg-blue-600 hover:bg-blue-700">
                 <Link href="/dashboard/post">
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Post Your First Shift
