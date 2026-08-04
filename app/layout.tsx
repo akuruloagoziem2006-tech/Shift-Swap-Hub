@@ -3,8 +3,9 @@ import '@/globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'ShiftSwap',
-  description: 'Shift swap platform for essential workers',
+  title: 'ShiftSwap v2 - Smart Shift Management',
+  description: 'The smarter way to swap shifts. Post shifts, find coverage, get approvals—all in one beautiful app.',
+  keywords: ['shift swap', 'work scheduling', 'team management', 'shift planning'],
 };
 
 export default function RootLayout({
