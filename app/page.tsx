@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftRight, Shield, CheckCircle, Clock, Zap, Bell, Users, Star, Play, ArrowRight, Github, Linkedin, Mail } from 'lucide-react';
+import { ArrowLeftRight, Shield, CheckCircle, Clock, Zap, Bell, Users, Play, ArrowRight, Github, Linkedin, Mail } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -42,12 +42,6 @@ export default function Home() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 sm:pt-40 sm:pb-28 px-4 sm:px-6 relative">
         <div className="max-w-5xl mx-auto text-center relative">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-8">
-            <Zap className="size-4" />
-            <span>Trusted by 10,000+ shift workers</span>
-          </div>
-          
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-[1.1] tracking-tight">
             <span className="bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
@@ -78,27 +72,6 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-          </div>
-
-          {/* Social Proof */}
-          <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8">
-            <div className="flex items-center gap-3">
-              <div className="flex -space-x-2">
-                {['MK', 'JT', 'SL', 'AR', 'PW'].map((initials, i) => (
-                  <div key={i} className="size-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-background flex items-center justify-center text-xs font-medium text-white shadow-lg">
-                    {initials}
-                  </div>
-                ))}
-              </div>
-              <div className="text-left">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="size-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground">4.9/5 from 2,000+ reviews</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
