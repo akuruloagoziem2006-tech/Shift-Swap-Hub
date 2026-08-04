@@ -128,15 +128,94 @@ function AuthPageContent() {
     setDemoLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    // First try to sign in with demo credentials
+    let { error, data: authData } = await supabase.auth.signInWithPassword({
       email: 'demo@shiftswap.app',
       password: 'demo1234',
     });
 
-    if (error) {
+    // If demo account doesn't exist, create it
+    if (error && error.message === 'Invalid login credentials') {
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: 'demo@shiftswap.app',
+        password: 'demo1234',
+        options: {
+          data: { full_name: 'Demo User' }
+        }
+      });
+
+      if (signUpError) {
+        setError('Could not create demo account. Please try again.');
+        setDemoLoading(false);
+        return;
+      }
+      authData = signUpData;
+      error = null;
+    } else if (error) {
       setError('Demo account is not available. Please sign up for a new account.');
       setDemoLoading(false);
-    } else {
+      return;
+    }
+
+    if (authData?.user) {
+      // Create sample profile if needed
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (!existingProfile) {
+        await supabase.from('profiles').insert({
+          id: authData.user.id,
+          full_name: 'Demo User',
+          email: 'demo@shiftswap.app',
+          role: 'worker'
+        });
+      }
+
+      // Create sample shifts for the demo
+      const today = new Date();
+      const sampleShifts = [
+        { 
+          date: new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          start_time: '09:00:00',
+          end_time: '17:00:00',
+          position: 'Nurse',
+          department: 'Emergency',
+          location: 'Hospital Main',
+          notes: 'Morning shift - coverage needed',
+          status: 'open'
+        },
+        {
+          date: new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          start_time: '14:00:00',
+          end_time: '22:00:00',
+          position: 'Cashier',
+          department: 'Retail',
+          location: 'Downtown Store',
+          notes: 'Evening shift',
+          status: 'open'
+        },
+        {
+          date: new Date(today.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          start_time: '06:00:00',
+          end_time: '14:00:00',
+          position: 'Server',
+          department: 'Food Service',
+          location: 'Main Cafeteria',
+          notes: 'Breakfast shift',
+          status: 'open'
+        }
+      ];
+
+      for (const shift of sampleShifts) {
+        await supabase.from('shifts').insert({
+          ...shift,
+          user_id: authData.user.id
+        });
+      }
+
       window.location.href = '/dashboard';
     }
   };

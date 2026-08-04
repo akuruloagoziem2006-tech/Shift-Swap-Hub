@@ -328,16 +328,20 @@ export default function BrowseShifts() {
           ))}
         </div>
       ) : (
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border ring-2 ring-blue-500/30">
           <CardContent className="p-12 text-center">
             <div className="inline-flex p-4 bg-blue-500/10 rounded-full mb-4">
               <CalendarOff className="w-12 h-12 text-blue-500" />
             </div>
-            <p className="text-xl font-semibold mb-2">No shifts available</p>
+            <p className="text-xl font-semibold mb-2">
+              {searchTerm || departmentFilter !== 'all' 
+                ? 'No shifts match your search'
+                : 'No shifts available'}
+            </p>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               {searchTerm || departmentFilter !== 'all' 
-                ? 'No shifts match your search. Try adjusting your filters.'
-                : 'When colleagues post shifts for swap, they\'ll appear here. Be the first to post!'}
+                ? 'Try adjusting your filters or search terms to find more shifts.'
+                : 'When colleagues post shifts for swap, they\'ll appear here. Be the first to post a shift and help your team!'}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {(searchTerm || departmentFilter !== 'all') && (
@@ -348,16 +352,14 @@ export default function BrowseShifts() {
                   Clear Filters
                 </Button>
               )}
-              <Button variant="outline" onClick={() => loadShifts()}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
-              <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                <Link href="/dashboard/post">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Post Your First Shift
-                </Link>
-              </Button>
+              {!searchTerm && departmentFilter === 'all' && (
+                <Button asChild className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6 h-auto">
+                  <Link href="/dashboard/post">
+                    <PlusCircle className="h-5 w-5 mr-2" />
+                    Post Your First Shift
+                  </Link>
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

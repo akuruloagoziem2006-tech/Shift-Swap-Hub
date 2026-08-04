@@ -317,14 +317,25 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card className={`bg-card border-border ${myShifts.length === 0 ? 'ring-2 ring-blue-500/30' : ''}`}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">My Shifts</CardTitle>
             <Calendar className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl md:text-3xl font-bold">{myShifts.length}</div>
-            <p className="text-xs text-muted-foreground">Upcoming shifts</p>
+            {myShifts.length === 0 ? (
+              <Button asChild size="sm" className="w-full bg-blue-600 hover:bg-blue-700">
+                <Link href="/dashboard/post">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Post Your First Shift
+                </Link>
+              </Button>
+            ) : (
+              <>
+                <div className="text-2xl md:text-3xl font-bold">{myShifts.length}</div>
+                <p className="text-xs text-muted-foreground">Upcoming shifts</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -345,8 +356,11 @@ export default function Dashboard() {
             <TrendingUp className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl md:text-3xl font-bold">-</div>
-            <p className="text-xs text-muted-foreground">Track your swaps</p>
+            <Button asChild size="sm" variant="outline" className="w-full">
+              <Link href="/dashboard/my-shifts">
+                View Requests
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -462,25 +476,20 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          <Card className="bg-card border-border">
+          <Card className="bg-card border-border ring-2 ring-blue-500/30">
             <CardContent className="p-12 text-center">
               <div className="inline-flex p-4 bg-blue-500/10 rounded-full mb-4">
                 <CalendarOff className="w-12 h-12 text-blue-500" />
               </div>
-              <p className="text-xl font-semibold mb-2">No open shifts available</p>
+              <p className="text-xl font-semibold mb-2">No open shifts yet</p>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                When colleagues post shifts for swap, they'll appear here. Be the first to post!
+                Be the first to post a shift! Share your availability and help your team cover shifts easily.
               </p>
               <div className="flex flex-wrap justify-center gap-3">
-                <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                <Button asChild className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6 h-auto">
                   <Link href="/dashboard/post">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Post a Shift
-                  </Link>
-                </Button>
-                <Button asChild variant="outline">
-                  <Link href="/dashboard/browse">
-                    Browse All
+                    <PlusCircle className="mr-2 h-5 w-5" />
+                    Post Your First Shift
                   </Link>
                 </Button>
               </div>
